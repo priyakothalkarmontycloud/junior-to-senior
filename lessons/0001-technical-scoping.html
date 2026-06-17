@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 01 — Technical Scoping: From Fuzzy to Precise</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 17px;
+      line-height: 1.8;
+      color: #1c1c1e;
+      background: #fffff8;
+    }
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 6rem;
+    }
+
+    /* ─── Header ─── */
+    .lesson-meta {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: normal;
+      line-height: 1.15;
+      color: #1c1c1e;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-style: italic;
+      color: #636366;
+      font-size: 1.05rem;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ─── Typography ─── */
+    h2 {
+      font-size: 1.25rem;
+      font-weight: normal;
+      margin: 2.75rem 0 0.6rem;
+      color: #1c1c1e;
+      border-bottom: 1px solid #d1d1d6;
+      padding-bottom: 0.25rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: bold;
+      margin: 1.75rem 0 0.35rem;
+      color: #1c1c1e;
+    }
+
+    p { margin-bottom: 1rem; }
+
+    hr {
+      border: none;
+      border-top: 1px solid #d1d1d6;
+      margin: 2.5rem 0;
+    }
+
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    ol, ul {
+      padding-left: 1.5rem;
+      margin: 0.75rem 0 1rem;
+    }
+
+    li { margin-bottom: 0.45rem; }
+
+    em { font-style: italic; }
+
+    /* ─── Comparison block ─── */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .compare-box {
+      border-radius: 6px;
+      padding: 1rem 1.1rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .compare-box .label {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .compare-box.bad {
+      background: #fff0f0;
+      border: 1px solid #ffc5c5;
+    }
+    .compare-box.bad .label { color: #cc2222; }
+
+    .compare-box.good {
+      background: #f0fff4;
+      border: 1px solid #a8e6b8;
+    }
+    .compare-box.good .label { color: #1a7f37; }
+
+    /* ─── Callout ─── */
+    .callout {
+      background: #f2f2f7;
+      border-left: 3px solid #8e8e93;
+      padding: 0.9rem 1.2rem;
+      margin: 1.25rem 0;
+      border-radius: 0 5px 5px 0;
+      font-size: 0.95rem;
+    }
+
+    .callout.key {
+      border-left-color: #0066cc;
+      background: #f0f6ff;
+    }
+
+    /* ─── Scope doc display ─── */
+    .scope-doc {
+      background: #1c1c1e;
+      color: #e5e5ea;
+      font-family: 'SF Mono', 'Fira Code', 'Menlo', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      padding: 1.5rem 1.75rem;
+      border-radius: 8px;
+      margin: 1rem 0 1.5rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .scope-doc .field { color: #64d2ff; font-weight: bold; }
+    .scope-doc .note  { color: #98989d; font-style: italic; }
+
+    /* ─── Pitfalls ─── */
+    .pitfall {
+      background: #fff8f0;
+      border: 1px solid #ffd6a5;
+      border-left: 3px solid #ff9500;
+      border-radius: 0 6px 6px 0;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+    }
+
+    .pitfall-name {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9a5700;
+      margin-bottom: 0.35rem;
+    }
+
+    .pitfall p { margin-bottom: 0.5rem; }
+
+    .detection {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.85rem;
+      color: #636366;
+      background: rgba(0,0,0,0.04);
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .detection::before {
+      content: "🔍 Detection: ";
+      font-weight: 600;
+      color: #3a3a3c;
+    }
+
+    /* ─── Quiz ─── */
+    .quiz {
+      background: #f2f2f7;
+      border-radius: 12px;
+      padding: 2rem 2rem 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .quiz-header {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .score-display {
+      font-weight: 700;
+      color: #1c1c1e;
+      display: none;
+    }
+
+    .question {
+      margin-bottom: 1.75rem;
+    }
+
+    .question-text {
+      font-weight: bold;
+      font-size: 0.98rem;
+      margin-bottom: 0.65rem;
+      line-height: 1.5;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .option-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.55rem 1rem;
+      background: white;
+      border: 1px solid #c7c7cc;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      font-size: 0.93rem;
+      color: #1c1c1e;
+      transition: border-color 0.1s, background 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #0066cc;
+      background: #f5f8ff;
+    }
+
+    .option-btn:disabled { cursor: default; }
+
+    .option-btn.correct {
+      background: #d4edda;
+      border-color: #34c759;
+      color: #155724;
+      font-weight: bold;
+    }
+
+    .option-btn.wrong {
+      background: #fde8e8;
+      border-color: #ff3b30;
+      color: #7d1111;
+    }
+
+    .feedback {
+      display: none;
+      font-family: -apple-system, sans-serif;
+      font-size: 0.85rem;
+      color: #3a3a3c;
+      margin-top: 0.6rem;
+      padding: 0.55rem 0.85rem;
+      background: white;
+      border-radius: 6px;
+      border-left: 3px solid #34c759;
+      line-height: 1.55;
+    }
+
+    .feedback.show { display: block; }
+
+    .feedback.wrong-feedback { border-left-color: #ff3b30; }
+
+    /* ─── Primary source ─── */
+    .source-box {
+      background: #f0f6ff;
+      border: 1px solid #c5d8f5;
+      border-radius: 8px;
+      padding: 1.25rem 1.4rem;
+      margin: 1.25rem 0;
+    }
+
+    .source-label {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0066cc;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .source-box p { margin-bottom: 0.5rem; }
+    .source-box p:last-child { margin-bottom: 0; }
+
+    /* ─── Footer ─── */
+    .lesson-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #d1d1d6;
+      font-family: -apple-system, sans-serif;
+      font-size: 0.88rem;
+      color: #636366;
+      line-height: 1.6;
+    }
+
+    .teacher-prompt {
+      background: #f9f9f9;
+      border: 1px solid #e5e5ea;
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    /* ─── Print ─── */
+    @media print {
+      body { background: white; font-size: 15px; }
+      .page { padding: 1rem; }
+      .option-btn { border: 1px solid #ccc !important; }
+      .quiz { background: #f9f9f9; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="lesson-meta">Strategic Programming · Lesson 01 of N</div>
+  <h1>Technical Scoping:<br>From Fuzzy to Precise</h1>
+  <p class="tagline">The single most leveraged skill in the AI era — deciding <em>what</em> to build before anyone touches a keyboard.</p>
+
+  <hr>
+
+  <h2>Why this skill is now table stakes</h2>
+
+  <p>In the old world, a junior developer was handed a ticket and wrote code. A senior developer figured out what the ticket <em>should</em> have said. That distinction — between executing on a spec and defining the spec — has always existed. But in the AI era, it has become the central skill gap.</p>
+
+  <p>AI tools can now write a Redux store, a REST endpoint, a SQL migration, a Pytest fixture. What they cannot do — without clear direction — is decide <em>what</em> to build or <em>why</em>. The bottleneck has moved upstream. And crucially: a fuzzy spec executed by an AI produces a wrong feature <em>faster</em> than ever before. The cost of vagueness has increased, not decreased.</p>
+
+  <p>Technical scoping is how you address this. It is the practice of writing down — precisely, briefly, and before any implementation — the problem you are solving, the constraints you are operating within, and the criteria you will use to know when you are done.</p>
+
+  <div class="callout key">
+    A well-written scope is also the best prompt you will ever give an AI coding tool. It is not coincidence that the skill that makes you a better developer also makes you a better AI director.
+  </div>
+
+  <hr>
+
+  <h2>The five parts of a scope document</h2>
+
+  <p>A scope document answers five questions, in this order:</p>
+
+  <ol>
+    <li><strong>Problem.</strong> What specific problem are we solving, and for whom?</li>
+    <li><strong>Non-goals.</strong> What are we explicitly <em>not</em> solving with this work?</li>
+    <li><strong>Constraints.</strong> What technical or business boundaries must the solution fit within?</li>
+    <li><strong>Success criteria.</strong> How will we demonstrate, measurably, that we are done?</li>
+    <li><strong>Approach sketch.</strong> At a high level, how will we solve it?</li>
+  </ol>
+
+  <div class="callout">
+    The order is intentional. Most developers write the approach first. Scoping discipline means holding off on <em>how</em> until you have fully committed to <em>what</em> and <em>why</em>. An approach written before a problem is understood is just a solution looking for a justification.
+  </div>
+
+  <h3>1. Problem</h3>
+
+  <p>The problem statement should be concrete and user-centered. Who is affected? What can they not currently do? What does that cost them — in time, money, or frustration? A vague problem produces a vague scope, which produces the wrong feature.</p>
+
+  <div class="compare">
+    <div class="compare-box bad">
+      <div class="label">Too vague</div>
+      "We need to improve search."
+    </div>
+    <div class="compare-box good">
+      <div class="label">Precise</div>
+      "Cloud engineers cannot filter the resource map by AWS tag. They export to CSV and filter in Excel — 10–15 min per investigation."
+    </div>
+  </div>
+
+  <h3>2. Non-goals</h3>
+
+  <p>Non-goals are decisions, written explicitly, about what this work will <em>not</em> do. They protect against scope creep. They also surface hidden disagreements: if your PM assumed the feature included saved filters and you assumed it didn't, a non-goals section catches that before a single line is written. A scope with no non-goals usually hasn't been reviewed by stakeholders.</p>
+
+  <h3>3. Constraints</h3>
+
+  <p>Constraints are real limits that bound your solution space. Existing APIs you must use (or avoid). Performance budgets. Security requirements. Backward-compatibility obligations. Deadlines. Recording constraints saves you from designing beautiful solutions that cannot actually ship.</p>
+
+  <h3>4. Success criteria</h3>
+
+  <p>A success criterion is only valid if a skeptical QA engineer could write a test for it. "The feature is fast" is not a success criterion. "Filtering 10,000 resources returns results in under 300ms on a standard connection" is. Good criteria are measurable, falsifiable, and leave no room for debate about whether you're "done."</p>
+
+  <div class="compare">
+    <div class="compare-box bad">
+      <div class="label">Untestable</div>
+      "The UI should feel responsive and intuitive."
+    </div>
+    <div class="compare-box good">
+      <div class="label">Testable</div>
+      "Filter results load in &lt;400ms for accounts with ≤50,000 resources. Clearing the filter restores state without a page reload."
+    </div>
+  </div>
+
+  <h3>5. Approach sketch</h3>
+
+  <p>Only now do you describe the approach. This should be high-level enough to invite critique — not a detailed design. It answers: what will we build, at what layer, using what existing components? The goal is to surface architectural disagreements before expensive implementation begins. If someone reads your approach and immediately sees a problem, that is the scope working exactly as intended.</p>
+
+  <hr>
+
+  <h2>A worked example</h2>
+
+  <p>Here is a real-world-style scenario. A product manager files a ticket. Below it is the scope document that should be written before any coding starts.</p>
+
+  <div class="callout" style="border-left-color: #ff9500; background: #fff8f0;">
+    <strong>Incoming ticket:</strong><br>
+    "Add resource filtering by tags. Should be fast and intuitive. Users have been asking for this."
+  </div>
+
+  <p>Thirty minutes of scoping work produces this:</p>
+
+  <div class="scope-doc"><span class="field">Problem</span>
+Cloud engineers reviewing AWS infrastructure in the resource map have no way
+to filter resources by tag key-value pair. They currently export to CSV and
+filter manually in Excel, adding 10–15 min to every investigation. Affects
+~40% of daily active users (based on support ticket volume).
+
+<span class="field">Non-goals</span>
+  - Saved or shared filter configurations
+  - Cross-account or cross-region tag search
+  - Filtering by non-tag resource properties (follow-on ticket)
+  - Mobile UI changes
+
+<span class="field">Constraints</span>
+  - Must use the existing ResourceQuery API v2; no new endpoints in this release
+  - Tag values can include Unicode; filter must handle this correctly
+  - Must not degrade list-view performance for users who never use filtering
+
+<span class="field">Success criteria</span>
+  - User can filter the resource map by one or more tag key-value pairs
+  - Filter results load in &lt;500ms for accounts with ≤50,000 resources (p95)
+  - Clearing the filter restores unfiltered state without a page reload
+  - Zero regression in existing Playwright tests for the resource map
+
+<span class="field">Approach sketch</span>
+  Filter panel added to the resource map sidebar. Filter state is URL-encoded
+  (shareable links). Client-side filtering for accounts &lt;5,000 resources;
+  server-side query params for larger accounts. Uses existing ResourceQuery
+  component — no new network layer needed.</div>
+
+  <p>This document takes 30–45 minutes to write. It will save days of rework and one very uncomfortable "wait, I thought we were also doing…" conversation in sprint review.</p>
+
+  <hr>
+
+  <h2>Three pitfalls to recognise</h2>
+
+  <div class="pitfall">
+    <div class="pitfall-name">Pitfall 1 — Solution-first thinking</div>
+    <p>Writing the approach before fully defining the problem. This locks you into a solution before you have confirmed it is the right one. Approaches feel concrete and satisfying to write. Problems feel vague and uncomfortable to sit with. That discomfort is where the real work is.</p>
+    <div class="detection">If your first sentence names a technical component ("we'll add a filter panel…") rather than a user problem, you started at the wrong end. Rewrite the problem statement first.</div>
+  </div>
+
+  <div class="pitfall">
+    <div class="pitfall-name">Pitfall 2 — Unmeasurable success criteria</div>
+    <p>Criteria like "the UI should feel fast" or "users will love it" cannot be tested. They leave room for endless late-stage disagreement about whether the work is done — and, crucially, whether it's good enough to deploy.</p>
+    <div class="detection">Apply the QA engineer test: could someone write an automated test, or demonstrate pass/fail to a skeptic, from this criterion alone? If not, rewrite it with a number or a specific observable behavior.</div>
+  </div>
+
+  <div class="pitfall">
+    <div class="pitfall-name">Pitfall 3 — No non-goals</div>
+    <p>A scope without non-goals has usually not been reviewed by anyone outside engineering. Non-goals are where you discover that your PM had a bigger feature in mind. Better to find that out in a 10-minute review than two weeks into a sprint.</p>
+    <div class="detection">After writing non-goals, ask: "Would any stakeholder be surprised by any of these?" If yes, that's a conversation to have now — not after implementation.</div>
+  </div>
+
+  <hr>
+
+  <h2>Check your understanding</h2>
+
+  <div class="quiz">
+    <div class="quiz-header">
+      <span>4 questions · answer from memory</span>
+      <span class="score-display" id="score-display"></span>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question" id="q1">
+      <div class="question-text">1. Before describing <em>how</em> to build something, a scope must first define…</div>
+      <ul class="options">
+        <li><button class="option-btn" data-correct="true"  onclick="answer(this,'q1')">What problem you are solving now</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q1')">Who is assigned to build it</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q1')">When the feature must be shipped</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q1')">Which language the code will use</button></li>
+      </ul>
+      <div class="feedback" id="q1-fb">
+        The approach comes last. Problem → Non-goals → Constraints → Success criteria → Approach. Jumping to "how" before "what" is the most common scoping failure mode — and the one AI tools will happily accelerate for you.
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question" id="q2">
+      <div class="question-text">2. The purpose of "non-goals" in a scope document is to…</div>
+      <ul class="options">
+        <li><button class="option-btn" data-correct="true"  onclick="answer(this,'q2')">Make scope exclusions explicit and written</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q2')">List metrics chosen to measure success</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q2')">Record risks deemed too costly to fix</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q2')">Name features planned for next quarter</button></li>
+      </ul>
+      <div class="feedback" id="q2-fb">
+        Non-goals surface hidden assumptions. They force the question: "Are we all agreed on what this is <em>not</em>?" If a stakeholder sees a non-goal and objects, you've just saved yourself from building the wrong thing. That's non-goals working exactly as intended.
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question" id="q3">
+      <div class="question-text">3. A spec says "search should feel instant." The fatal flaw is…</div>
+      <ul class="options">
+        <li><button class="option-btn" data-correct="true"  onclick="answer(this,'q3')">It cannot be measured or tested objectively</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q3')">Search features belong in a later phase</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q3')">Users rarely care about search speed anyway</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q3')">Performance work should always be done separately</button></li>
+      </ul>
+      <div class="feedback" id="q3-fb">
+        "Feel instant" is subjective and untestable. A QA engineer cannot write a test for it. A developer cannot know when they've achieved it. A better criterion: "Returns results in &lt;200ms at p95 for accounts with up to 10,000 resources." Concrete, measurable, falsifiable.
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question" id="q4">
+      <div class="question-text">4. In the AI era, technical scoping is more valuable because…</div>
+      <ul class="options">
+        <li><button class="option-btn" data-correct="true"  onclick="answer(this,'q4')">AI generates code but needs precise direction</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q4')">AI removes the need for code review</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q4')">AI writes tests freeing humans to scope</button></li>
+        <li><button class="option-btn" data-correct="false" onclick="answer(this,'q4')">AI tools require clearer project management</button></li>
+      </ul>
+      <div class="feedback" id="q4-fb">
+        A bad scope executed by a human wastes a day. A bad scope executed by an AI wastes a day — and produces something that <em>looks</em> finished. The cost of vagueness has gone up, not down. Scoping is how you give AI a precise target, and how you know when it hit it.
+      </div>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <h2>Primary source</h2>
+
+  <div class="source-box">
+    <div class="source-label">Recommended reading</div>
+    <p><strong><a href="https://basecamp.com/shapeup" target="_blank">Shape Up — Ryan Singer (Basecamp, free online)</a></strong></p>
+    <p>The most practical book on the craft of shaping work before it enters development. Chapters 1–5 cover what this lesson introduces. The concept of "appetite" — how much time a problem is <em>worth</em>, as distinct from how long it will <em>take</em> — is particularly worth studying. Read alongside your next sprint planning session.</p>
+  </div>
+
+  <hr>
+
+  <h2>Reference</h2>
+
+  <p>A printable scoping template you can use immediately: <a href="../reference/scoping-template.html">Scoping Template →</a></p>
+
+  <hr>
+
+  <div class="lesson-footer">
+    <div class="teacher-prompt">
+      Have a question? Something that didn't click? Ask your teacher directly — type a follow-up in the session. This lesson is a starting point, not the whole story.
+    </div>
+    <p>
+      <strong>Next lesson options:</strong> Architecture Decision Records (ADRs) · System Design Thinking · QA Strategy · Codebase Orientation
+    </p>
+    <p style="margin-top: 0.75rem; color: #8e8e93;">
+      Strategic Programming series · <a href="../lessons/">All lessons</a> · <a href="../reference/scoping-template.html">Scoping Template</a>
+    </p>
+  </div>
+
+</div>
+
+<script>
+  var answered = 0;
+  var correct  = 0;
+  var total    = 4;
+
+  function answer(btn, questionId) {
+    var isCorrect = btn.dataset.correct === 'true';
+    var question  = document.getElementById(questionId);
+    var allBtns   = question.querySelectorAll('.option-btn');
+    var feedback  = document.getElementById(questionId + '-fb');
+
+    // Prevent double-answering
+    if (btn.disabled) return;
+
+    allBtns.forEach(function(b) {
+      b.disabled = true;
+      if (b === btn) {
+        b.classList.add(isCorrect ? 'correct' : 'wrong');
+      }
+      if (!isCorrect && b.dataset.correct === 'true') {
+        b.classList.add('correct');
+      }
+    });
+
+    feedback.classList.add('show');
+    if (!isCorrect) feedback.classList.add('wrong-feedback');
+
+    answered++;
+    if (isCorrect) correct++;
+
+    if (answered === total) {
+      var display = document.getElementById('score-display');
+      display.textContent = correct + ' / ' + total + ' correct';
+      display.style.display = 'inline';
+    }
+  }
+</script>
+</body>
+</html>

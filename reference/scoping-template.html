@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scoping Template</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #1c1c1e;
+      background: #f2f2f7;
+    }
+
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .header {
+      margin-bottom: 2rem;
+    }
+
+    .ref-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.3rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #1c1c1e;
+      margin-bottom: 0.2rem;
+    }
+
+    .subtitle {
+      color: #636366;
+      font-size: 0.9rem;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid #e5e5ea;
+    }
+
+    .field-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .field-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      min-width: 1.5rem;
+    }
+
+    .field-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1c1c1e;
+    }
+
+    .field-hint {
+      font-size: 0.82rem;
+      color: #8e8e93;
+      margin-left: auto;
+      font-style: italic;
+    }
+
+    .field-guide {
+      font-size: 0.82rem;
+      color: #636366;
+      margin-bottom: 0.75rem;
+      padding-left: 2.1rem;
+      line-height: 1.5;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 80px;
+      border: 1px solid #d1d1d6;
+      border-radius: 7px;
+      padding: 0.65rem 0.85rem;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      color: #1c1c1e;
+      resize: vertical;
+      background: #fafafa;
+      line-height: 1.65;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #0066cc;
+      background: white;
+    }
+
+    textarea::placeholder {
+      color: #c7c7cc;
+      font-style: italic;
+    }
+
+    .non-goals-area { min-height: 100px; }
+    .constraints-area { min-height: 90px; }
+    .criteria-area { min-height: 110px; }
+    .approach-area { min-height: 100px; }
+
+    /* ─── Rules strip ─── */
+    .rules {
+      background: #1c1c1e;
+      color: #e5e5ea;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .rules-title {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.6rem;
+    }
+
+    .rules ul {
+      padding-left: 1.25rem;
+    }
+
+    .rules li {
+      margin-bottom: 0.3rem;
+      color: #d1d1d6;
+    }
+
+    .rules li strong {
+      color: #64d2ff;
+    }
+
+    /* ─── Links ─── */
+    .back-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    /* ─── Print ─── */
+    @media print {
+      body { background: white; }
+      .page { padding: 1rem; }
+      textarea {
+        border: 1px solid #ccc;
+        background: white;
+        min-height: 60px;
+      }
+      .rules { background: #1c1c1e; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="ref-label">Reference · Strategic Programming</div>
+    <h1>Scope Document Template</h1>
+    <p class="subtitle">Fill this out before any implementation begins. Target: 30–45 minutes.</p>
+  </div>
+
+  <!-- Problem -->
+  <div class="card">
+    <div class="field-header">
+      <span class="field-num">01</span>
+      <span class="field-name">Problem</span>
+      <span class="field-hint">Who? What can't they do? What does it cost?</span>
+    </div>
+    <p class="field-guide">User-centered and concrete. Name the affected group, the missing capability, and the measurable harm. Avoid mentioning any solution.</p>
+    <textarea placeholder="[Role] cannot [action] because [reason]. This costs them [time/money/trust] per [unit]."></textarea>
+  </div>
+
+  <!-- Non-goals -->
+  <div class="card">
+    <div class="field-header">
+      <span class="field-num">02</span>
+      <span class="field-name">Non-goals</span>
+      <span class="field-hint">What are we consciously NOT doing?</span>
+    </div>
+    <p class="field-guide">List things that might seem related but are out of scope. These protect you from scope creep and surface hidden stakeholder assumptions. If you can't list any, you haven't thought hard enough.</p>
+    <textarea class="non-goals-area" placeholder="- [Adjacent feature] — not in this release&#10;- [Related improvement] — follow-on ticket&#10;- [Edge case] — out of scope by design"></textarea>
+  </div>
+
+  <!-- Constraints -->
+  <div class="card">
+    <div class="field-header">
+      <span class="field-num">03</span>
+      <span class="field-name">Constraints</span>
+      <span class="field-hint">What boxes must the solution fit inside?</span>
+    </div>
+    <p class="field-guide">Real limits: existing APIs to use or avoid, performance budgets, security requirements, backward-compatibility needs, hard deadlines. Record only limits that actually exist — not aspirational ones.</p>
+    <textarea class="constraints-area" placeholder="- Must use [existing component/API]; no new [X] in this release&#10;- Must not degrade [existing behavior]&#10;- Must handle [edge case, e.g. Unicode, large datasets]"></textarea>
+  </div>
+
+  <!-- Success criteria -->
+  <div class="card">
+    <div class="field-header">
+      <span class="field-num">04</span>
+      <span class="field-name">Success Criteria</span>
+      <span class="field-hint">How do we know we're done — measurably?</span>
+    </div>
+    <p class="field-guide">Each criterion must pass the QA test: could someone write an automated test, or demonstrate pass/fail to a skeptic? If it contains words like "feel," "seems," or "intuitive," rewrite it.</p>
+    <textarea class="criteria-area" placeholder="- [User action] works correctly for [scope/edge cases]&#10;- [Operation] completes in &lt;[time] at p[percentile] for [load scenario]&#10;- Zero regression in [existing test suite / behavior]"></textarea>
+  </div>
+
+  <!-- Approach sketch -->
+  <div class="card">
+    <div class="field-header">
+      <span class="field-num">05</span>
+      <span class="field-name">Approach Sketch</span>
+      <span class="field-hint">High-level only — enough to invite critique</span>
+    </div>
+    <p class="field-guide">Write this last. Name what layer you're touching, which existing components you're using, and the key architectural decision. This is not a design doc — it's a conversation starter.</p>
+    <textarea class="approach-area" placeholder="Add [component] to [location]. [State/data] is handled by [mechanism]. Uses existing [X] — no new [Y] needed.&#10;&#10;Key decision: [tradeoff made and why]."></textarea>
+  </div>
+
+  <!-- Rules -->
+  <div class="rules">
+    <div class="rules-title">Quick rules</div>
+    <ul>
+      <li><strong>Order matters.</strong> Problem → Non-goals → Constraints → Success criteria → Approach. Never start with the approach.</li>
+      <li><strong>Testable criteria only.</strong> If a QA engineer can't write a test from it, rewrite it with a number or observable behavior.</li>
+      <li><strong>Non-goals are a forcing function.</strong> If stakeholders are surprised by one, that's a conversation to have now — not in sprint review.</li>
+      <li><strong>Approach is a sketch, not a plan.</strong> Detail belongs in the design doc, not here. If someone spots a flaw in your approach, the scope worked.</li>
+      <li><strong>30–45 min target.</strong> Longer means you're designing, not scoping. Shorter means you probably skipped something.</li>
+    </ul>
+  </div>
+
+  <a class="back-link" href="../lessons/0001-technical-scoping.html">← Back to Lesson 01</a>
+
+</div>
+</body>
+</html>
