@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 03 — Design Your Components Before You Build Them</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 17px;
+      line-height: 1.8;
+      color: #1c1c1e;
+      background: #fffff8;
+    }
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 6rem;
+    }
+
+    .lesson-meta {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: normal;
+      line-height: 1.15;
+      color: #1c1c1e;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-style: italic;
+      color: #636366;
+      font-size: 1.05rem;
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: normal;
+      margin: 2.75rem 0 0.6rem;
+      color: #1c1c1e;
+      border-bottom: 1px solid #d1d1d6;
+      padding-bottom: 0.25rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: bold;
+      margin: 1.75rem 0 0.4rem;
+    }
+
+    p { margin-bottom: 1.1rem; }
+    ul, ol { margin: 0.5rem 0 1.1rem 1.5rem; }
+    li { margin-bottom: 0.35rem; }
+
+    a { color: #007aff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    strong { font-weight: bold; }
+    em { font-style: italic; }
+
+    code {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.85em;
+      background: #f2f2f7;
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+    }
+
+    /* ─── Callout ─── */
+    .callout {
+      background: #f2f2f7;
+      border-left: 3px solid #007aff;
+      border-radius: 0 6px 6px 0;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .callout.insight {
+      border-left-color: #34c759;
+      background: #f0fff4;
+    }
+
+    .callout.warning {
+      border-left-color: #ff9500;
+      background: #fff9f0;
+    }
+
+    /* ─── Component tree diagram ─── */
+    .tree {
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 0.85rem;
+      background: #1c1c1e;
+      color: #f2f2f7;
+      border-radius: 10px;
+      padding: 1.4rem 1.6rem;
+      margin: 1.2rem 0;
+      line-height: 1.9;
+    }
+
+    .tree .component { color: #64d2ff; }
+    .tree .owns { color: #ffd60a; }
+    .tree .comment { color: #8e8e93; }
+    .tree .arrow { color: #ff9f0a; }
+
+    /* ─── State rule card ─── */
+    .rule-card {
+      border: 1.5px solid #d1d1d6;
+      border-radius: 10px;
+      padding: 1.1rem 1.3rem;
+      margin: 1rem 0;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .rule-number {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #007aff;
+      min-width: 1.8rem;
+      line-height: 1.6;
+    }
+
+    .rule-body { font-size: 0.95rem; line-height: 1.65; }
+    .rule-body strong { display: block; margin-bottom: 0.2rem; }
+
+    /* ─── Before/After ─── */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.2rem 0;
+    }
+
+    .split-panel {
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .split-panel.bad {
+      background: #fff0f0;
+      border: 1.5px solid #ff3b30;
+    }
+
+    .split-panel.good {
+      background: #f0fff4;
+      border: 1.5px solid #34c759;
+    }
+
+    .split-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .split-panel.bad .split-label { color: #c0392b; }
+    .split-panel.good .split-label { color: #1c7a36; }
+
+    /* ─── Quiz ─── */
+    .quiz-section {
+      background: #f2f2f7;
+      border-radius: 12px;
+      padding: 1.6rem 1.8rem;
+      margin: 2rem 0;
+    }
+
+    .quiz-section h2 {
+      border: none;
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    .question-block { margin: 1.5rem 0; }
+
+    .question-text {
+      font-weight: bold;
+      margin-bottom: 0.75rem;
+      font-size: 0.97rem;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      padding: 0.55rem 0.8rem;
+      border-radius: 8px;
+      border: 1.5px solid #d1d1d6;
+      background: #fff;
+      font-size: 0.93rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .option:hover { border-color: #007aff; background: #f0f6ff; }
+    .option input[type="radio"] { display: none; }
+
+    .option.correct { border-color: #34c759; background: #f0fff4; color: #1c7a36; }
+    .option.incorrect { border-color: #ff3b30; background: #fff0f0; color: #c0392b; }
+    .option.dimmed { opacity: 0.5; }
+
+    .feedback {
+      font-size: 0.9rem;
+      margin-top: 0.6rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.correct { background: #d4edda; color: #1c7a36; }
+    .feedback.incorrect { background: #fde8e7; color: #c0392b; }
+
+    /* ─── Challenge ─── */
+    .challenge {
+      border: 2px dashed #d1d1d6;
+      border-radius: 10px;
+      padding: 1.4rem 1.6rem;
+      margin: 2rem 0;
+    }
+
+    .challenge-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.6rem;
+    }
+
+    .challenge p { margin-bottom: 0.75rem; }
+    .challenge p:last-child { margin-bottom: 0; }
+
+    /* ─── Primary source ─── */
+    .primary-source {
+      background: #1c1c1e;
+      color: #f2f2f7;
+      border-radius: 10px;
+      padding: 1.3rem 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .primary-source .source-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.4rem;
+    }
+
+    .primary-source a { color: #64d2ff; }
+    .primary-source p { font-size: 0.92rem; color: #aeaeb2; margin-bottom: 0; line-height: 1.6; }
+
+    /* ─── Teacher note ─── */
+    .teacher-note {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.88rem;
+      background: #fffbea;
+      border: 1px solid #f5c842;
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      margin: 2.5rem 0;
+      color: #5a4a00;
+    }
+
+    .teacher-note strong { color: #3d3100; }
+
+    /* ─── Nav ─── */
+    .lesson-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #d1d1d6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.88rem;
+      color: #8e8e93;
+    }
+
+    .lesson-nav a { color: #007aff; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="lesson-meta">Lesson 03 &nbsp;·&nbsp; Strategic Programming in the AI Era</div>
+  <h1>Design Your Components Before You Build Them</h1>
+  <p class="tagline">The sketch that saves you from the refactor.</p>
+
+  <!-- ─── Why ─── -->
+  <h2>The problem this solves</h2>
+
+  <p>Most frontend developers open a new file and start writing a component. The shape of the UI emerges as they code — state gets added when something needs to change, props get passed when a child needs data. This works for small things. For anything larger, it leads to components that do too much, state scattered across the wrong places, and refactors that could have been avoided with five minutes of upfront thinking.</p>
+
+  <p>Strategic developers do one thing before they write a component: they draw the tree. On paper, in a comment, in a whiteboard photo. The tree shows you what you're about to build and — crucially — <em>who owns what</em>.</p>
+
+  <div class="callout insight">
+    <strong>The core habit:</strong> Before writing any component code, sketch the hierarchy and label which component owns which piece of state. This is the frontend equivalent of scoping — defining the shape before filling it in.
+  </div>
+
+  <!-- ─── Skill 1: Decomposition ─── -->
+  <h2>Skill 1: Decompose the UI into a hierarchy</h2>
+
+  <p>Look at any piece of UI and ask: <em>what are the natural parts?</em> Each part that has a single, clear job becomes a component. A component that has two clear jobs should probably be two components.</p>
+
+  <p>This is called the <strong>single responsibility principle</strong> applied to UI: a component should do one thing. If it grows to do more, break it apart.</p>
+
+  <p>Consider a filter panel on a cloud resource dashboard — a feature you might recognise from MontyCloud. Before writing anything, the tree looks like this:</p>
+
+  <div class="tree">
+<span class="component">&lt;DashboardPage&gt;</span>            <span class="comment">← page container</span>
+  <span class="component">&lt;FilterBar&gt;</span>              <span class="comment">← search + dropdowns</span>
+    <span class="component">&lt;SearchInput&gt;</span>
+    <span class="component">&lt;StatusDropdown&gt;</span>
+    <span class="component">&lt;RegionDropdown&gt;</span>
+  <span class="component">&lt;ResourceList&gt;</span>           <span class="comment">← shows filtered results</span>
+    <span class="component">&lt;ResourceCard&gt;</span>          <span class="comment">← one card per resource</span>
+    <span class="component">&lt;EmptyState&gt;</span>            <span class="comment">← shown when 0 results</span></div>
+
+  <p>This took two minutes to sketch. It already answers: how many components are needed, what each one is responsible for, and what the nesting looks like. You can split this work across two developers without a meeting.</p>
+
+  <!-- ─── Skill 2: State ownership ─── -->
+  <h2>Skill 2: Decide who owns the state</h2>
+
+  <p>Decomposing the tree is the easy part. The important question — the one that will haunt you six months later if you get it wrong — is: <strong>which component owns each piece of state?</strong></p>
+
+  <p>There is one rule that resolves almost every case:</p>
+
+  <div class="callout">
+    <strong>State lives in the lowest common ancestor of everything that needs it.</strong>
+  </div>
+
+  <p>In English: find every component that reads or changes a piece of state. The state belongs in the closest parent they share.</p>
+
+  <p>Apply this to the filter state from the example above:</p>
+
+  <ul>
+    <li><code>FilterBar</code> needs to write the filter (user changes it here)</li>
+    <li><code>ResourceList</code> needs to read the filter (it shows filtered results)</li>
+    <li>Their lowest common ancestor is <code>DashboardPage</code></li>
+  </ul>
+
+  <p>Therefore: <strong>filter state lives in <code>DashboardPage</code></strong>.</p>
+
+  <div class="tree">
+<span class="component">&lt;DashboardPage&gt;</span>    <span class="owns">← owns: filters, resources</span>
+  <span class="component">&lt;FilterBar</span>
+    filters={filters}
+    <span class="arrow">onFilterChange={setFilters}</span> /&gt;
+  <span class="component">&lt;ResourceList</span>
+    resources={filteredResources} /&gt;</div>
+
+  <h3>What if you put state in the wrong place?</h3>
+
+  <div class="split">
+    <div class="split-panel bad">
+      <div class="split-label">Wrong — state in FilterBar</div>
+      <code>FilterBar</code> owns the filter state. Now <code>ResourceList</code> can't read it — it's stuck inside <code>FilterBar</code>. You end up lifting it out later anyway, touching both components. That's the refactor you wanted to avoid.
+    </div>
+    <div class="split-panel good">
+      <div class="split-label">Right — state in DashboardPage</div>
+      <code>DashboardPage</code> owns the filter state. <code>FilterBar</code> receives it as a prop and fires <code>onFilterChange</code>. <code>ResourceList</code> receives filtered results. Each component does one thing.
+    </div>
+  </div>
+
+  <!-- ─── Three state types ─── -->
+  <h2>Three questions to find the right state home</h2>
+
+  <p>Not all state follows the same rule. Before placing state, ask which type it is:</p>
+
+  <div class="rule-card">
+    <div class="rule-number">1</div>
+    <div class="rule-body">
+      <strong>Only one component needs this.</strong>
+      Keep it local — <code>useState</code> inside that component. Example: whether a dropdown is open.
+    </div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-number">2</div>
+    <div class="rule-body">
+      <strong>A few nearby components need this.</strong>
+      Lift it to their lowest common ancestor and pass it down as props. Example: a filter value shared between a filter bar and a results list.
+    </div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-number">3</div>
+    <div class="rule-body">
+      <strong>Many components across the app need this, or it's server data.</strong>
+      Use a global store (Zustand, Redux) or a server-state library (React Query, SWR). Example: the current logged-in user, or a list of cloud resources fetched from an API.
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <strong>The most common mistake:</strong> jumping straight to a global store for state that only two adjacent components need. Global state is powerful but has a cost — harder to trace, harder to test, harder to reason about. Use it only when lifting state would require passing props through many unrelated layers.
+  </div>
+
+  <!-- ─── Connecting to ADRs ─── -->
+  <h2>When the design produces a decision worth recording</h2>
+
+  <p>Sketching the component tree will surface forks — moments where you genuinely have to choose between two reasonable approaches. Those forks are where ADRs belong.</p>
+
+  <p>For example: when you decide that filter state belongs in <code>DashboardPage</code> as local state rather than in a global Zustand store, that decision might be worth recording if it affects multiple engineers. Not every component design produces an ADR — but the decision about <em>where state lives for a whole feature</em> often does.</p>
+
+  <!-- ─── Quiz ─── -->
+  <div class="quiz-section">
+    <h2>Check your understanding</h2>
+    <p style="font-size: 0.9rem; color: #636366; margin-bottom: 0.5rem;">Select the best answer for each question.</p>
+
+    <!-- Q1 -->
+    <div class="question-block" id="q1">
+      <div class="question-text">1. A <code>SearchInput</code> component needs to know the current search term. A <code>ResultsList</code> component also needs it to filter results. Where should the search term state live?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q1', this, false)">
+          <input type="radio" name="q1"> Inside the SearchInput component, passed up via a callback
+        </label>
+        <label class="option" onclick="answer('q1', this, true)">
+          <input type="radio" name="q1"> In their closest common parent, passed down as props to both
+        </label>
+        <label class="option" onclick="answer('q1', this, false)">
+          <input type="radio" name="q1"> In a global Zustand store accessible by all components
+        </label>
+        <label class="option" onclick="answer('q1', this, false)">
+          <input type="radio" name="q1"> Duplicated in both components, synced via a custom hook
+        </label>
+      </div>
+      <div class="feedback" id="q1-feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" id="q2">
+      <div class="question-text">2. A <code>Tooltip</code> component needs to track whether it is currently visible. No other component cares about this. Where should that state live?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q2', this, false)">
+          <input type="radio" name="q2"> In the page-level component that renders the Tooltip
+        </label>
+        <label class="option" onclick="answer('q2', this, true)">
+          <input type="radio" name="q2"> Locally inside the Tooltip component with useState
+        </label>
+        <label class="option" onclick="answer('q2', this, false)">
+          <input type="radio" name="q2"> In a global store so it can be reset from anywhere
+        </label>
+        <label class="option" onclick="answer('q2', this, false)">
+          <input type="radio" name="q2"> In a parent component so the Tooltip stays stateless
+        </label>
+      </div>
+      <div class="feedback" id="q2-feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" id="q3">
+      <div class="question-text">3. What is the primary reason to sketch the component tree before writing any code?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q3', this, false)">
+          <input type="radio" name="q3"> So you can estimate how many lines of code the feature needs
+        </label>
+        <label class="option" onclick="answer('q3', this, false)">
+          <input type="radio" name="q3"> So you can choose the right CSS framework for the UI
+        </label>
+        <label class="option" onclick="answer('q3', this, true)">
+          <input type="radio" name="q3"> To see the structure and decide who owns what before it is expensive to change
+        </label>
+        <label class="option" onclick="answer('q3', this, false)">
+          <input type="radio" name="q3"> To document the feature for stakeholders before development starts
+        </label>
+      </div>
+      <div class="feedback" id="q3-feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" id="q4">
+      <div class="question-text">4. Your app fetches the logged-in user's profile from an API. Fifteen components across the app display the user's name or avatar. Where does that data belong?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q4', this, false)">
+          <input type="radio" name="q4"> Fetched individually inside each component that needs it
+        </label>
+        <label class="option" onclick="answer('q4', this, false)">
+          <input type="radio" name="q4"> Lifted to the top-level App component and drilled as props
+        </label>
+        <label class="option" onclick="answer('q4', this, true)">
+          <input type="radio" name="q4"> In a global store or server-state library like React Query
+        </label>
+        <label class="option" onclick="answer('q4', this, false)">
+          <input type="radio" name="q4"> In the nearest common ancestor of all fifteen components
+        </label>
+      </div>
+      <div class="feedback" id="q4-feedback"></div>
+    </div>
+  </div>
+
+  <!-- ─── Challenge ─── -->
+  <h2>Your challenge</h2>
+
+  <div class="challenge">
+    <div class="challenge-label">Practise the habit</div>
+    <p>Pick any feature you are currently building or have recently built — a form, a list with filters, a modal, a dashboard panel.</p>
+    <p>Before touching any code: write out the component tree as text (like the examples above). Then label each piece of state and write which component owns it, and why.</p>
+    <p>Paste your tree here and I'll tell you whether the ownership looks right — and whether anything in it is a decision worth an ADR.</p>
+    <p><strong>If nothing comes to mind:</strong> Sketch the component tree for a notification bell icon that shows a badge count and opens a dropdown list of notifications when clicked.</p>
+  </div>
+
+  <!-- ─── Primary source ─── -->
+  <div class="primary-source">
+    <div class="source-label">Primary Source</div>
+    <strong style="color: #fff; font-size: 1.05rem;">
+      <a href="https://react.dev/learn/thinking-in-react" target="_blank">Thinking in React — React Docs</a>
+    </strong>
+    <p>The official React guide to component decomposition and state placement. Written by the React team, it walks through the exact two-step process taught in this lesson — draw the hierarchy, then find the state. Short, authoritative, worth reading in full.</p>
+  </div>
+
+  <!-- ─── Teacher note ─── -->
+  <div class="teacher-note">
+    <strong>Questions?</strong> Ask your Claude Code session anything that's unclear — whether a piece of state should be local or global, how to handle deeply nested components, or how to apply this to a feature you're currently working on.
+  </div>
+
+  <!-- ─── Nav ─── -->
+  <div class="lesson-nav">
+    <a href="./0002-architecture-decision-records.html">← Lesson 02: ADRs</a>
+    <span>Lesson 03 of ∞</span>
+    <span style="color: #d1d1d6;">Lesson 04 →</span>
+  </div>
+
+</div>
+
+<script>
+  const explanations = {
+    q1: {
+      correct: "Correct. Both components need the search term, so it belongs in their lowest common ancestor — passed down as a prop to SearchInput (to display it) and ResultsList (to filter by it).",
+      incorrect: "Not quite. The rule is: state lives in the lowest common ancestor of every component that needs it. Since both SearchInput and ResultsList need the term, it must live above both of them."
+    },
+    q2: {
+      correct: "Right. No other component cares whether the tooltip is visible, so there is no reason to lift that state. Keep it local inside Tooltip with useState.",
+      incorrect: "Not quite. When only one component needs a piece of state, the rule is to keep it local with useState. Lifting it or storing it globally adds unnecessary complexity."
+    },
+    q3: {
+      correct: "Exactly. The sketch surfaces structure and ownership decisions while they are still cheap to change — before they are embedded in actual code.",
+      incorrect: "Not quite. The purpose of the sketch is to surface structure and ownership decisions early, when changing them costs nothing. Estimation, CSS, and documentation are secondary concerns."
+    },
+    q4: {
+      correct: "Right. When many unrelated components across the app need the same server data, a global store or server-state library (React Query, SWR) is the right tool. Prop-drilling through 15 components would be unworkable.",
+      incorrect: "Not quite. When data is needed by many unrelated components across the whole app, lifting to a common ancestor means drilling through every layer — which is exactly what global state solves."
+    }
+  };
+
+  function answer(qid, el, isCorrect) {
+    const block = document.getElementById(qid);
+    if (block.dataset.answered) return;
+    block.dataset.answered = 'true';
+
+    const options = block.querySelectorAll('.option');
+    options.forEach(opt => {
+      opt.style.pointerEvents = 'none';
+      opt.classList.add('dimmed');
+    });
+
+    el.classList.remove('dimmed');
+    el.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+    if (!isCorrect) {
+      options.forEach(opt => {
+        if (opt.onclick && opt.onclick.toString().includes(', true)')) {
+          opt.classList.remove('dimmed');
+          opt.classList.add('correct');
+        }
+      });
+    }
+
+    const feedback = document.getElementById(qid + '-feedback');
+    feedback.textContent = explanations[qid][isCorrect ? 'correct' : 'incorrect'];
+    feedback.className = 'feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+  }
+</script>
+</body>
+</html>
