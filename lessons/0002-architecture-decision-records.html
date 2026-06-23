@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 02 — Architecture Decision Records</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 17px;
+      line-height: 1.8;
+      color: #1c1c1e;
+      background: #fffff8;
+    }
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 6rem;
+    }
+
+    /* ─── Header ─── */
+    .lesson-meta {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: normal;
+      line-height: 1.15;
+      color: #1c1c1e;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-style: italic;
+      color: #636366;
+      font-size: 1.05rem;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ─── Typography ─── */
+    h2 {
+      font-size: 1.25rem;
+      font-weight: normal;
+      margin: 2.75rem 0 0.6rem;
+      color: #1c1c1e;
+      border-bottom: 1px solid #d1d1d6;
+      padding-bottom: 0.25rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: bold;
+      margin: 1.75rem 0 0.4rem;
+      color: #1c1c1e;
+    }
+
+    p { margin-bottom: 1.1rem; }
+
+    ul, ol {
+      margin: 0.5rem 0 1.1rem 1.5rem;
+    }
+
+    li { margin-bottom: 0.35rem; }
+
+    a { color: #007aff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    strong { font-weight: bold; }
+    em { font-style: italic; }
+
+    /* ─── Callout ─── */
+    .callout {
+      background: #f2f2f7;
+      border-left: 3px solid #007aff;
+      border-radius: 0 6px 6px 0;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .callout.warning {
+      border-left-color: #ff9500;
+      background: #fff9f0;
+    }
+
+    .callout.insight {
+      border-left-color: #34c759;
+      background: #f0fff4;
+    }
+
+    /* ─── Code blocks ─── */
+    .code-block {
+      font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+      font-size: 0.82rem;
+      background: #f2f2f7;
+      border: 1px solid #d1d1d6;
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      margin: 1.2rem 0;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      color: #1c1c1e;
+    }
+
+    .code-block .comment { color: #8e8e93; }
+    .code-block .key { color: #007aff; font-weight: bold; }
+    .code-block .value { color: #34c759; }
+
+    /* ─── ADR anatomy ─── */
+    .adr-field {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+
+    .adr-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.75rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      background: #1c1c1e;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      margin-top: 0.2rem;
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .adr-label.optional {
+      background: #8e8e93;
+    }
+
+    .adr-body {
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* ─── Quiz ─── */
+    .quiz-section {
+      background: #f2f2f7;
+      border-radius: 12px;
+      padding: 1.6rem 1.8rem;
+      margin: 2rem 0;
+    }
+
+    .quiz-section h2 {
+      border: none;
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    .question-block {
+      margin: 1.5rem 0;
+    }
+
+    .question-text {
+      font-weight: bold;
+      margin-bottom: 0.75rem;
+      font-size: 0.97rem;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      padding: 0.55rem 0.8rem;
+      border-radius: 8px;
+      border: 1.5px solid #d1d1d6;
+      background: #fff;
+      font-size: 0.93rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .option:hover { border-color: #007aff; background: #f0f6ff; }
+
+    .option input[type="radio"] { display: none; }
+
+    .option.correct {
+      border-color: #34c759;
+      background: #f0fff4;
+      color: #1c7a36;
+    }
+
+    .option.incorrect {
+      border-color: #ff3b30;
+      background: #fff0f0;
+      color: #c0392b;
+    }
+
+    .option.dimmed {
+      opacity: 0.5;
+    }
+
+    .feedback {
+      font-size: 0.9rem;
+      margin-top: 0.6rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.correct { background: #d4edda; color: #1c7a36; }
+    .feedback.incorrect { background: #fde8e7; color: #c0392b; }
+
+    /* ─── Challenge ─── */
+    .challenge {
+      border: 2px dashed #d1d1d6;
+      border-radius: 10px;
+      padding: 1.4rem 1.6rem;
+      margin: 2rem 0;
+    }
+
+    .challenge-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.6rem;
+    }
+
+    .challenge p { margin-bottom: 0.75rem; }
+    .challenge p:last-child { margin-bottom: 0; }
+
+    /* ─── Status badges ─── */
+    .status-badge {
+      display: inline-block;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.78rem;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      margin-right: 0.4rem;
+    }
+
+    .status-proposed { background: #e5f1ff; color: #0057b8; }
+    .status-accepted { background: #d4edda; color: #1c7a36; }
+    .status-deprecated { background: #fde8e7; color: #c0392b; }
+    .status-superseded { background: #f2f2f7; color: #636366; }
+
+    /* ─── Nav ─── */
+    .lesson-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #d1d1d6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.88rem;
+      color: #8e8e93;
+    }
+
+    .lesson-nav a { color: #007aff; }
+
+    /* ─── Teacher note ─── */
+    .teacher-note {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.88rem;
+      background: #fffbea;
+      border: 1px solid #f5c842;
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      margin: 2.5rem 0;
+      color: #5a4a00;
+    }
+
+    .teacher-note strong { color: #3d3100; }
+
+    /* ─── Primary source ─── */
+    .primary-source {
+      background: #1c1c1e;
+      color: #f2f2f7;
+      border-radius: 10px;
+      padding: 1.3rem 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .primary-source .source-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8e8e93;
+      margin-bottom: 0.4rem;
+    }
+
+    .primary-source a { color: #64d2ff; }
+    .primary-source p { font-size: 0.92rem; color: #aeaeb2; margin-bottom: 0; line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="lesson-meta">Lesson 02 &nbsp;·&nbsp; Strategic Programming in the AI Era</div>
+  <h1>Architecture Decision Records</h1>
+  <p class="tagline">The decisions you make once, and explain forever.</p>
+
+  <!-- ─── Why this matters ─── -->
+  <h2>The problem ADRs solve</h2>
+
+  <p>Every non-trivial codebase contains decisions that look wrong until you know why they were made. The decision is in the code — the <em>why</em> is nowhere. Six months later, a new engineer "fixes" it and ships the same problem that was already solved. Or you write the same debate in Slack, again.</p>
+
+  <p>An <strong>Architecture Decision Record</strong> (ADR) is a short document that captures one significant decision: what you decided, the context that made it necessary, and the consequences you accepted. It costs fifteen minutes to write and saves hours of confusion across the life of the system.</p>
+
+  <div class="callout insight">
+    <strong>The core insight:</strong> Code shows <em>what</em> you built. ADRs show <em>why</em>. A codebase without ADRs forces every future reader to reverse-engineer intent from implementation — which is slow, error-prone, and often wrong.
+  </div>
+
+  <p>ADRs are not proposals or specs. They record decisions that have already been made. Think of them as immutable history: even a bad decision that was later reversed is kept in the record, marked as <em>superseded</em>, so the team can understand the sequence of reasoning that got here.</p>
+
+  <!-- ─── Anatomy ─── -->
+  <h2>The anatomy of an ADR</h2>
+
+  <p>The original format, proposed by Michael Nygard in 2011, has four parts. Everything else is decoration.</p>
+
+  <div style="margin: 1.5rem 0;">
+    <div class="adr-field">
+      <div class="adr-label">Title</div>
+      <div class="adr-body">Short, imperative. Describes the decision, not the problem. <em>"Use PostgreSQL for the reporting database"</em> not <em>"Database choice."</em></div>
+    </div>
+
+    <div class="adr-field">
+      <div class="adr-label">Status</div>
+      <div class="adr-body">
+        <span class="status-badge status-proposed">Proposed</span> — under discussion.<br>
+        <span class="status-badge status-accepted">Accepted</span> — in force.<br>
+        <span class="status-badge status-deprecated">Deprecated</span> — no longer valid, but no replacement yet.<br>
+        <span class="status-badge status-superseded">Superseded by ADR-007</span> — replaced by a later decision.
+      </div>
+    </div>
+
+    <div class="adr-field">
+      <div class="adr-label">Context</div>
+      <div class="adr-body">What is the situation? What forces are at play? Constraints, competing concerns, deadlines, team skills. Be factual — this is not where you defend the decision, just describe the world you were operating in.</div>
+    </div>
+
+    <div class="adr-field">
+      <div class="adr-label">Decision</div>
+      <div class="adr-body">State the decision directly and actively. <em>"We will use X."</em> One sentence is often enough. If you need more, you may be mixing multiple decisions into one ADR — split it.</div>
+    </div>
+
+    <div class="adr-field">
+      <div class="adr-label">Consequences</div>
+      <div class="adr-body">What follows from this decision? List both the <strong>benefits</strong> and the <strong>trade-offs accepted</strong>. A decision that lists only upsides is either obvious (and didn't need an ADR) or dishonest. Good consequences sections say what you're giving up.</div>
+    </div>
+  </div>
+
+  <!-- ─── Worked example ─── -->
+  <h2>A worked example</h2>
+
+  <p>Here's an ADR you might write at MontyCloud when deciding how to handle async job processing — a common decision in any SaaS with background work.</p>
+
+  <div class="code-block"><span class="key"># ADR-004: Use AWS SQS for async task dispatch</span>
+
+<span class="key">## Status</span>
+Accepted
+
+<span class="key">## Context</span>
+MontyCloud triggers long-running jobs (cloud drift checks, cost
+reports, policy enforcement scans) from API calls that must return
+quickly. We need a queue. Two options were evaluated:
+
+- Celery + Redis: already used in one service; team has experience.
+- AWS SQS: managed, scales to zero, no broker to operate.
+
+We are running fully on AWS. Operations overhead is a recurring
+concern — we have no dedicated infra team.
+
+<span class="key">## Decision</span>
+We will use AWS SQS for async task dispatch on all new services.
+
+<span class="key">## Consequences</span>
++ No broker infrastructure to manage or pay for at idle.
++ Dead-letter queues and visibility timeouts are built in.
++ Reduces operational surface for the engineering team.
+- SQS messages have a 256 KB payload limit; large payloads
+  need a "claim check" pattern (store in S3, pass reference).
+- Local development requires either LocalStack or mocked queues;
+  adds friction vs. a local Redis instance.
+- Existing Celery service (account-sync) remains on Redis until
+  it warrants a migration — creates a split until then.</div>
+
+  <div class="callout">
+    <strong>Notice what this ADR does not do:</strong> it doesn't explain how SQS works, link to AWS docs, or justify the decision at length. It records the choice and its trade-offs, clearly enough that someone who joins the team in two years can understand what was decided and why, in two minutes.
+  </div>
+
+  <!-- ─── What triggers an ADR ─── -->
+  <h2>When to write one</h2>
+
+  <p>Not every decision needs an ADR. Write one when the decision:</p>
+
+  <ul>
+    <li><strong>Has meaningful alternatives</strong> — if there was only one reasonable path, document it in a comment instead.</li>
+    <li><strong>Has non-obvious trade-offs</strong> — if the consequences aren't self-evident from the code, they need to be written.</li>
+    <li><strong>Will affect multiple engineers over time</strong> — if only you will ever read this code, the threshold is lower.</li>
+    <li><strong>Is hard to reverse</strong> — database schema choices, third-party dependencies, API contracts, auth mechanisms.</li>
+  </ul>
+
+  <p>Good rule of thumb: if the decision would come up in a code review and require more than two sentences to explain, it should be an ADR.</p>
+
+  <div class="callout warning">
+    <strong>The "just document it later" trap:</strong> The decision is clearest the moment it is made — you have the context in your head, the alternatives are fresh, the trade-offs are visible. Every day you wait, that context leaks away. Write the ADR when you make the decision, not when you remember to.
+  </div>
+
+  <!-- ─── Where to store ─── -->
+  <h2>Where ADRs live</h2>
+
+  <p>The standard is a directory in the repository — typically <code>docs/decisions/</code> or <code>adr/</code> — with one Markdown file per decision, named sequentially:</p>
+
+  <div class="code-block">docs/
+  decisions/
+    0001-use-postgresql-for-reporting.md
+    0002-single-tenant-schema-per-customer.md
+    0003-jwt-for-api-auth.md
+    0004-aws-sqs-for-async-dispatch.md</div>
+
+  <p>Keeping ADRs in the repository means they travel with the code, appear in pull request diffs, and are versioned alongside the decisions they describe. Some teams use Confluence or Notion — this works, but the ADRs become invisible to anyone looking only at the codebase.</p>
+
+  <!-- ─── Quiz ─── -->
+  <div class="quiz-section">
+    <h2>Check your understanding</h2>
+    <p style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #636366;">Select the best answer for each question.</p>
+
+    <!-- Q1 -->
+    <div class="question-block" id="q1">
+      <div class="question-text">1. What is the primary purpose of the Consequences section?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q1', this, false)">
+          <input type="radio" name="q1"> To explain how the technology works in detail
+        </label>
+        <label class="option" onclick="answer('q1', this, true)">
+          <input type="radio" name="q1"> To record both benefits and trade-offs accepted by the decision
+        </label>
+        <label class="option" onclick="answer('q1', this, false)">
+          <input type="radio" name="q1"> To list all the engineers who were involved in the discussion
+        </label>
+        <label class="option" onclick="answer('q1', this, false)">
+          <input type="radio" name="q1"> To justify why the rejected alternatives were wrong choices
+        </label>
+      </div>
+      <div class="feedback" id="q1-feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" id="q2">
+      <div class="question-text">2. A decision was made two years ago to use Redis for caching. It was a reasonable decision then, but the team has now moved fully to DynamoDB. What status should the original ADR carry?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q2', this, false)">
+          <input type="radio" name="q2"> Deprecated — the decision is no longer recommended
+        </label>
+        <label class="option" onclick="answer('q2', this, false)">
+          <input type="radio" name="q2"> Proposed — the original decision was never formally accepted
+        </label>
+        <label class="option" onclick="answer('q2', this, true)">
+          <input type="radio" name="q2"> Superseded by ADR-012 — replaced by the DynamoDB decision
+        </label>
+        <label class="option" onclick="answer('q2', this, false)">
+          <input type="radio" name="q2"> Accepted — historical decisions are never changed in the record
+        </label>
+      </div>
+      <div class="feedback" id="q2-feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" id="q3">
+      <div class="question-text">3. Which of these decisions most clearly warrants an ADR?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q3', this, false)">
+          <input type="radio" name="q3"> Renaming a variable from `data` to `user_accounts`
+        </label>
+        <label class="option" onclick="answer('q3', this, false)">
+          <input type="radio" name="q3"> Adding a new API endpoint to an existing REST resource
+        </label>
+        <label class="option" onclick="answer('q3', this, true)">
+          <input type="radio" name="q3"> Choosing to store multi-tenant data in separate schemas
+        </label>
+        <label class="option" onclick="answer('q3', this, false)">
+          <input type="radio" name="q3"> Fixing a typo in an error message string
+        </label>
+      </div>
+      <div class="feedback" id="q3-feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" id="q4">
+      <div class="question-text">4. What does the Context section of an ADR describe?</div>
+      <div class="options">
+        <label class="option" onclick="answer('q4', this, false)">
+          <input type="radio" name="q4"> The business justification written to convince stakeholders
+        </label>
+        <label class="option" onclick="answer('q4', this, false)">
+          <input type="radio" name="q4"> The technical background of the engineers making the decision
+        </label>
+        <label class="option" onclick="answer('q4', this, true)">
+          <input type="radio" name="q4"> The situation and forces that made this decision necessary
+        </label>
+        <label class="option" onclick="answer('q4', this, false)">
+          <input type="radio" name="q4"> The step-by-step instructions for implementing the decision
+        </label>
+      </div>
+      <div class="feedback" id="q4-feedback"></div>
+    </div>
+  </div>
+
+  <!-- ─── The challenge ─── -->
+  <h2>Your challenge</h2>
+
+  <div class="challenge">
+    <div class="challenge-label">Practise writing one</div>
+    <p>Think of a real decision you have made (or observed being made) in your current work — something where alternatives were considered, and where someone joining the team later would benefit from knowing why this path was chosen.</p>
+    <p>Write the ADR using the four sections: <strong>Title, Status, Context, Decision, Consequences</strong>. Aim for under 200 words total. Then read it back as if you were a new engineer encountering it six months from now.</p>
+    <p><strong>If nothing comes to mind:</strong> Write the ADR for this decision — <em>"Should MontyCloud use row-level security in Postgres or application-layer tenant isolation?"</em> — from whichever side you believe is correct. Focus on making the Context and Consequences honest.</p>
+  </div>
+
+  <!-- ─── Primary source ─── -->
+  <div class="primary-source">
+    <div class="source-label">Primary Source</div>
+    <strong style="color: #fff; font-size: 1.05rem;">
+      <a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions" target="_blank">Documenting Architecture Decisions — Michael Nygard (2011)</a>
+    </strong>
+    <p>The original article that defined ADRs. Five minutes to read. Nygard's insight that decisions are "immutable" — you can supersede them, but not erase them — is the most important idea here. Read this before writing your first real ADR.</p>
+  </div>
+
+  <!-- ─── Teacher note ─── -->
+  <div class="teacher-note">
+    <strong>Questions?</strong> Ask your Claude Code session anything that's unclear — why the Context section matters, how to handle a decision that was made by committee, whether a particular decision in your codebase deserves an ADR. The agent is your teacher for this material.
+  </div>
+
+  <!-- ─── Nav ─── -->
+  <div class="lesson-nav">
+    <a href="./0001-technical-scoping.html">← Lesson 01: Technical Scoping</a>
+    <span>Lesson 02 of ∞</span>
+    <span style="color: #d1d1d6;">Lesson 03 →</span>
+  </div>
+
+</div>
+
+<script>
+  const explanations = {
+    q1: {
+      correct: "Right. Consequences must capture both sides — what you gain and what you accept as a cost. An ADR that only lists upsides is either obvious or misleading.",
+      incorrect: "Not quite. The Consequences section is about recording the real trade-offs — both benefits and costs — not explanation, attribution, or justification of alternatives."
+    },
+    q2: {
+      correct: "Correct. When one decision replaces another, the older ADR is marked Superseded and should reference the ADR that replaced it. This preserves the sequence of reasoning.",
+      incorrect: "Not quite. Deprecated means no longer valid with no replacement yet. Superseded specifically means a later decision replaced this one — which is the case here, since DynamoDB is now the standard."
+    },
+    q3: {
+      correct: "Yes. Multi-tenancy isolation strategy has meaningful alternatives, hard-to-reverse consequences, and affects every engineer who touches the data layer. Classic ADR territory.",
+      incorrect: "Not quite. The others are small, reversible, or self-evident. ADRs are for decisions with meaningful alternatives, real trade-offs, and lasting impact on the system."
+    },
+    q4: {
+      correct: "Exactly. Context is the world you were operating in — constraints, forces, competing concerns — that made this decision necessary. Not persuasion, not instructions, just the situation.",
+      incorrect: "Not quite. Context is purely descriptive: the situation and forces that existed when the decision was made. It's not about justification, background, or implementation."
+    }
+  };
+
+  function answer(qid, el, isCorrect) {
+    const block = document.getElementById(qid);
+    if (block.dataset.answered) return;
+    block.dataset.answered = 'true';
+
+    const options = block.querySelectorAll('.option');
+    options.forEach(opt => {
+      opt.style.pointerEvents = 'none';
+      opt.classList.add('dimmed');
+    });
+
+    el.classList.remove('dimmed');
+    el.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+    if (!isCorrect) {
+      options.forEach(opt => {
+        if (opt.onclick && opt.onclick.toString().includes('true')) {
+          opt.classList.remove('dimmed');
+          opt.classList.add('correct');
+        }
+      });
+    }
+
+    const feedback = document.getElementById(qid + '-feedback');
+    feedback.textContent = explanations[qid][isCorrect ? 'correct' : 'incorrect'];
+    feedback.className = 'feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+  }
+</script>
+</body>
+</html>
