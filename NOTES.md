@@ -23,3 +23,4 @@
 
 - 2026-06-17: First session. Mission established, first lesson written on Technical Scoping.
 - 2026-06-23: Second session. Lesson 02 written on Architecture Decision Records (ADRs). Lesson 03 written on component decomposition and state ownership — first fully frontend-grounded lesson.
+- 2026-06-24: Third session. Lesson 04 written on the Frontend Feature Spec — synthesises Lessons 01-03 into a single deliverable. MontyCloud Cost Alerts used as worked example.

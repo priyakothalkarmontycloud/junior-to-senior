@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 04 — The Frontend Feature Spec</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a1a;
+      --muted: #5a5a5a;
+      --rule: #d8d0c4;
+      --bg: #faf8f4;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --warn: #92400e;
+      --warn-light: #fef3c7;
+      --success: #166534;
+      --success-light: #dcfce7;
+      --fail: #991b1b;
+      --fail-light: #fee2e2;
+      --code-bg: #f4f1ec;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+
+    body {
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--ink);
+      background: var(--bg);
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    /* ── Typography ── */
+    h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin-bottom: 0.3rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin: 2.8rem 0 0.7rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    p  { margin-bottom: 1rem; }
+    ul, ol { margin: 0 0 1rem 1.4rem; }
+    li { margin-bottom: 0.3rem; }
+    a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 700; }
+    em { font-style: italic; }
+    hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+    /* ── Lesson header ── */
+    .lesson-meta {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .lesson-nav {
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      margin-bottom: 3rem;
+    }
+    .lesson-nav a { color: var(--muted); border-bottom-color: var(--rule); }
+    .lesson-nav a:hover { color: var(--accent); }
+
+    /* ── Callouts ── */
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-light);
+      padding: 0.9rem 1.1rem;
+      margin: 1.6rem 0;
+      border-radius: 0 4px 4px 0;
+      font-family: var(--sans);
+      font-size: 0.93rem;
+    }
+    .callout-warn {
+      border-left-color: #d97706;
+      background: var(--warn-light);
+      color: var(--warn);
+    }
+
+    /* ── Code / spec blocks ── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 1.1rem 1.3rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin: 1.2rem 0;
+    }
+    code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: var(--code-bg);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+    pre code { background: none; padding: 0; font-size: inherit; }
+
+    /* ── Section cards ── */
+    .spec-section {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      overflow: hidden;
+    }
+    .spec-section-header {
+      background: var(--code-bg);
+      padding: 0.5rem 1rem;
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--rule);
+    }
+    .spec-section-body {
+      padding: 0.9rem 1rem;
+      font-size: 0.92rem;
+      font-family: var(--sans);
+      line-height: 1.6;
+    }
+
+    /* ── Five sections summary ── */
+    .five-sections {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0 1rem;
+      margin: 1.4rem 0;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+    }
+    .five-sections .num {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      padding-top: 0.15rem;
+    }
+    .five-sections .label { font-weight: 700; }
+    .five-sections .desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.8rem; }
+
+    /* ── Quiz ── */
+    .quiz {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 1.4rem 1.5rem;
+      margin: 2rem 0;
+      background: #fff;
+    }
+    .quiz h2 { margin-top: 0; }
+    .quiz-q {
+      margin-bottom: 1.6rem;
+    }
+    .quiz-q p {
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.7rem;
+    }
+    .quiz-q label {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--rule);
+      border-radius: 5px;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+      transition: background 0.1s;
+      line-height: 1.4;
+    }
+    .quiz-q label:hover { background: #f5f3ef; }
+    .quiz-q input[type=radio] { margin-right: 0.5rem; }
+    .feedback {
+      display: none;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: 5px;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+    .feedback.correct { background: var(--success-light); color: var(--success); display: block; }
+    .feedback.wrong   { background: var(--fail-light);    color: var(--fail);    display: block; }
+    .quiz-btn {
+      display: inline-block;
+      margin-top: 1.2rem;
+      padding: 0.55rem 1.2rem;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .quiz-btn:hover { background: #1d4ed8; }
+    #quiz-score {
+      display: none;
+      margin-top: 1.2rem;
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    /* ── Footer ── */
+    .footer-note {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--rule);
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer-note a { color: var(--muted); }
+
+    @media print {
+      body { background: #fff; padding: 1rem; }
+      .quiz-btn, .quiz { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="lesson-meta">Lesson 04 · Strategic Programming</div>
+<h1>The Frontend Feature Spec</h1>
+<div class="lesson-nav">
+  ← <a href="0001-technical-scoping.html">Lesson 01: Technical Scoping</a> ·
+  <a href="0002-architecture-decision-records.html">Lesson 02: ADRs</a> ·
+  <a href="0003-component-design-before-you-build.html">Lesson 03: Component Design</a>
+</div>
+
+<p>
+  The gap between a junior and a senior developer isn't code quality.
+  It's what happens <em>before</em> the code.
+</p>
+
+<p>
+  A junior dev receives a ticket and opens a file.
+  A senior dev receives the same ticket and opens a blank document.
+</p>
+
+<p>
+  That document — the frontend feature spec — is what this lesson is about.
+  It synthesises <a href="0001-technical-scoping.html">scoping</a>,
+  <a href="0002-architecture-decision-records.html">architectural thinking</a>, and
+  <a href="0003-component-design-before-you-build.html">component design</a> into
+  a single deliverable you can produce in 30 minutes, before a single line of code is written.
+</p>
+
+<hr>
+
+<h2>Why bother? Decisions are cheapest early.</h2>
+
+<p>
+  Joel Spolsky wrote in
+  <a href="https://www.joelonsoftware.com/2000/10/02/painless-functional-specifications-part-1-why-bother/" target="_blank">Painless Functional Specifications</a>
+  (2000) that the reason projects fail isn't bad code — it's ambiguous requirements.
+  The spec forces ambiguity to surface on paper, where it costs nothing to resolve.
+</p>
+
+<p>
+  For frontend work specifically, writing a spec before building surfaces three expensive surprises:
+</p>
+
+<ol>
+  <li><strong>Missing API endpoints</strong> — you discover the backend doesn't have what you need on day 1, not day 5.</li>
+  <li><strong>State ownership disputes</strong> — you find out two features need the same data before you've wired them independently.</li>
+  <li><strong>Scope creep</strong> — you draw a bright line now, so stakeholders can't add "just one more thing" mid-build.</li>
+</ol>
+
+<div class="callout">
+  A spec doesn't have to be long. The best ones are one page. The goal isn't completeness — it's <strong>surfacing the right questions at the right time</strong>.
+</div>
+
+<hr>
+
+<h2>The five sections of a frontend spec</h2>
+
+<div class="five-sections">
+  <div class="num">1</div>
+  <div>
+    <div class="label">Why</div>
+    <div class="desc">The business reason. One or two sentences. If you can't state why, you shouldn't build it.</div>
+  </div>
+
+  <div class="num">2</div>
+  <div>
+    <div class="label">What (scope)</div>
+    <div class="desc">A concrete list of what's in scope and what's explicitly out of scope. Out-of-scope is as important as in-scope.</div>
+  </div>
+
+  <div class="num">3</div>
+  <div>
+    <div class="label">Component tree sketch</div>
+    <div class="desc">The hierarchy, in words or ASCII. From Lesson 03: each node does one thing.</div>
+  </div>
+
+  <div class="num">4</div>
+  <div>
+    <div class="label">State decisions</div>
+    <div class="desc">What lives where and why. From Lesson 03: state in the lowest common ancestor that needs it.</div>
+  </div>
+
+  <div class="num">5</div>
+  <div>
+    <div class="label">Open questions</div>
+    <div class="desc">Unknowns that must be answered before or during the build. Each question has an owner and a deadline.</div>
+  </div>
+</div>
+
+<p>
+  Notice what's <em>not</em> here: no timeline, no ticket numbers, no implementation details.
+  Those belong elsewhere. The spec is a <strong>design document</strong>, not a project plan.
+</p>
+
+<hr>
+
+<h2>Worked example: Cost Alerts for MontyCloud</h2>
+
+<p>
+  You receive this Jira ticket:
+  <em>"Users want to be notified when their cloud spend exceeds a budget threshold."</em>
+</p>
+
+<p>Before touching any code, here's the spec you'd write:</p>
+
+<div class="spec-section">
+  <div class="spec-section-header">1 · Why</div>
+  <div class="spec-section-body">
+    Customer support is receiving 3–5 tickets per week about unexpected cloud bills.
+    Configurable spend alerts will reduce those tickets and increase user trust in the platform.
+  </div>
+</div>
+
+<div class="spec-section">
+  <div class="spec-section-header">2 · What (scope)</div>
+  <div class="spec-section-body">
+    <strong>In scope:</strong>
+    <ul>
+      <li>A user can set a monthly spend threshold per cloud account.</li>
+      <li>An email notification is sent when spend exceeds the threshold.</li>
+      <li>Alerts can be enabled, edited, or disabled.</li>
+    </ul>
+    <strong>Out of scope (explicitly):</strong>
+    <ul>
+      <li>SMS or in-app notifications (v2).</li>
+      <li>Per-service thresholds (e.g. "alert only if EC2 exceeds $X").</li>
+      <li>Alert history or notification logs.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="spec-section">
+  <div class="spec-section-header">3 · Component tree sketch</div>
+  <div class="spec-section-body">
+<pre>BillingPage
+└── AlertsPanel
+    ├── AlertsList        (read-only: existing alerts from API)
+    ├── AlertFormModal    (create / edit)
+    │   ├── ThresholdInput
+    │   ├── AccountSelector
+    │   └── NotificationEmailInput
+    └── [Save / Delete controls]</pre>
+  </div>
+</div>
+
+<div class="spec-section">
+  <div class="spec-section-header">4 · State decisions</div>
+  <div class="spec-section-body">
+    <ul>
+      <li><code>alerts</code> (list of saved alerts) → <strong>React Query</strong>. Server state; fetched from <code>/api/alerts</code>. Cached, invalidated on save/delete.</li>
+      <li><code>formValues</code> (threshold, email, accountId in the modal) → <strong>local state in <code>AlertFormModal</code></strong>. Only that component needs it. Reset on close.</li>
+      <li><code>isModalOpen</code> → <strong>local state in <code>AlertsPanel</code></strong>. Both the trigger (list item) and the modal live inside <code>AlertsPanel</code>.</li>
+    </ul>
+    <p style="margin-top:0.5rem; color: #555;">No global store needed. State is either server-owned (React Query) or component-local.</p>
+  </div>
+</div>
+
+<div class="spec-section">
+  <div class="spec-section-header">5 · Open questions</div>
+  <div class="spec-section-body">
+    <ul>
+      <li><strong>Does the backend have a <code>/api/alerts</code> endpoint?</strong> — Ask backend team by EOD Tuesday. <em>(Blocks build.)</em></li>
+      <li><strong>One threshold per user, or one per cloud account?</strong> — The ticket says "per account" but the current data model only has a user-level budget. Needs PM clarification before we design AccountSelector.</li>
+      <li><strong>Who sends the email?</strong> — SendGrid, SES, or existing notification service? Determines whether we build the sender or just write the trigger.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout callout-warn">
+  <strong>Look at question 2.</strong> If Priya had started building immediately, she'd have built <code>ThresholdInput</code> with a user-level assumption. The PM would have said "per account" in review. A day of rework — and a messy state migration — avoided by one question written in a document.
+</div>
+
+<hr>
+
+<h2>The spec as an ADR trigger</h2>
+
+<p>
+  Notice section 4. Every state decision is a micro-ADR: a choice with reasoning.
+  But these choices don't warrant a full standalone ADR because they're routine applications of
+  the state ownership rule from <a href="0003-component-design-before-you-build.html">Lesson 03</a>.
+</p>
+
+<p>
+  A full <a href="0002-architecture-decision-records.html">ADR</a> is warranted only when a
+  decision is <em>non-obvious, hard to reverse, or contested</em>. For the alerts feature, the question
+  "do we use React Query or local state?" is routine. But "do we introduce a new global Zustand
+  store for alerts to share state with the billing summary widget?" — <em>that's</em> an ADR.
+</p>
+
+<hr>
+
+<h2>Practice: spot the broken spec</h2>
+
+<div class="quiz" id="quiz">
+  <h2>Quiz — four questions</h2>
+  <p style="font-family:var(--sans);font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">
+    Choose the best answer for each. Feedback appears immediately.
+  </p>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <p>1. You receive: <em>"Add a filter to the resource list so users can filter by cloud provider."</em> You sit down to write a spec. What section do you write first?</p>
+    <label><input type="radio" name="q1" value="a"> Component tree — you need to know where the filter goes.</label>
+    <label><input type="radio" name="q1" value="b"> Why — understand the business reason before deciding what to build.</label>
+    <label><input type="radio" name="q1" value="c"> Open questions — surface unknowns before writing anything else.</label>
+    <label><input type="radio" name="q1" value="d"> What (scope) — define the boundaries first so nothing is ambiguous.</label>
+    <div class="feedback" id="q1-correct">Correct. "Why" comes first. If you can't articulate the business reason, you risk optimising the wrong problem. The ticket says "filter by provider" — but is the real goal reducing misclick errors, or speeding up a specific workflow? The why shapes the what.</div>
+    <div class="feedback wrong" id="q1-wrong">Not quite. The correct answer is <strong>Why</strong>. Understanding the business reason first prevents you from optimising the wrong problem. Even small features deserve a one-sentence justification — it frames every decision that follows.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2">
+    <p>2. A teammate's spec for a "Save dashboard layout" feature has: <em>Why, component tree, state decisions, open questions</em>. What section is missing?</p>
+    <label><input type="radio" name="q2" value="a"> Acceptance criteria — the spec needs test cases.</label>
+    <label><input type="radio" name="q2" value="b"> What (scope) — in/out scope isn't defined, so anything could be added mid-build.</label>
+    <label><input type="radio" name="q2" value="c"> Timeline — without a deadline the spec is unactionable.</label>
+    <label><input type="radio" name="q2" value="d"> ADR links — every decision needs a full Architecture Decision Record.</label>
+    <div class="feedback" id="q2-correct">Correct. Without an explicit scope section, there's no bright line around what's in and what's out. Stakeholders will interpret gaps as implicit yeses. "Save layout" will quietly grow to include sharing, exporting, and versioning. The out-of-scope list is as important as the in-scope list.</div>
+    <div class="feedback wrong" id="q2-wrong">Not quite. The missing section is <strong>What (scope)</strong>. Without explicit in/out-of-scope boundaries, stakeholders will add "just one more thing" mid-build. Timelines and acceptance criteria belong elsewhere; the spec is a design document, not a project plan.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3">
+    <p>3. In the Cost Alerts spec, why does <code>isModalOpen</code> live in <code>AlertsPanel</code> rather than in <code>AlertFormModal</code> itself?</p>
+    <label><input type="radio" name="q3" value="a"> Because modals always need their state lifted to the parent.</label>
+    <label><input type="radio" name="q3" value="b"> Because <code>AlertsPanel</code> renders the trigger button that opens the modal, so it also needs to know whether it's open.</label>
+    <label><input type="radio" name="q3" value="c"> Because global state is more reliable than local state for UI interactions.</label>
+    <label><input type="radio" name="q3" value="d"> Because React Query should manage all boolean UI state.</label>
+    <div class="feedback" id="q3-correct">Correct. This is the state ownership rule from Lesson 03 applied: state lives in the lowest common ancestor of every component that needs it. The trigger (in <code>AlertsPanel</code>) and the modal (a child of <code>AlertsPanel</code>) both need <code>isModalOpen</code>, so it belongs in <code>AlertsPanel</code> — not inside the modal itself, which can't reach its parent's trigger.</div>
+    <div class="feedback wrong" id="q3-wrong">Not quite. The correct answer is <strong>b</strong>. This is the state ownership rule from Lesson 03: state lives in the lowest common ancestor that needs it. The trigger button lives in <code>AlertsPanel</code>, not inside the modal — so the modal can't own state that controls whether it's open. Modals don't need lifting as a rule; only when the trigger is outside the modal.</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4">
+    <p>4. When does a state decision in the spec <em>warrant a full ADR</em> rather than just a note in the spec?</p>
+    <label><input type="radio" name="q4" value="a"> Always — every decision should have a formal ADR for traceability.</label>
+    <label><input type="radio" name="q4" value="b"> When the decision is non-obvious, hard to reverse, or contested — not for routine application of known rules.</label>
+    <label><input type="radio" name="q4" value="c"> Only when the decision involves adding a new npm dependency.</label>
+    <label><input type="radio" name="q4" value="d"> When the PM asks for documentation of the technical approach.</label>
+    <div class="feedback" id="q4-correct">Correct. Writing an ADR for every micro-decision creates noise and teaches the team to ignore ADRs. The trigger is non-obvious + hard-to-reverse + contested. "Should form state be local or in Zustand?" is routine. "Should we introduce a new shared store that three features will depend on?" is a fork — that's an ADR.</div>
+    <div class="feedback wrong" id="q4-wrong">Not quite. The correct answer is <strong>b</strong>. An ADR is warranted only when the decision is non-obvious, hard to reverse, or contested. Writing ADRs for routine decisions creates noise and trains the team to ignore them. The spec holds the routine decisions; the ADR holds the forks.</div>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz()">Check answers</button>
+  <div id="quiz-score"></div>
+</div>
+
+<hr>
+
+<h2>Your next feature</h2>
+
+<p>
+  Before writing any code for your next ticket at MontyCloud:
+</p>
+
+<ol>
+  <li>Open a blank document (Notion, a <code>.md</code> file, or paper).</li>
+  <li>Write the five sections. Budget 30 minutes maximum.</li>
+  <li>Share the spec with one teammate before you start building. Their first question is your first open question.</li>
+</ol>
+
+<p>
+  The spec doesn't need to be perfect. It needs to exist.
+  A rough spec that surfaces one ambiguity paid for itself.
+</p>
+
+<div class="callout">
+  <strong>Primary source:</strong>
+  <a href="https://www.joelonsoftware.com/2000/10/02/painless-functional-specifications-part-1-why-bother/" target="_blank">Painless Functional Specifications — Joel Spolsky (4 parts, ~30 min read)</a>.
+  Written in 2000 and still the clearest argument for why specs exist and what they save you from.
+  Read part 1 today; parts 2–4 are worth a weekend.
+</div>
+
+<hr>
+
+<h2>Lesson summary</h2>
+
+<ul>
+  <li>A frontend feature spec is a 30-minute, one-page document written before any code.</li>
+  <li>Five sections: <strong>Why · What · Component tree · State decisions · Open questions.</strong></li>
+  <li>The out-of-scope list is as important as the in-scope list.</li>
+  <li>State decisions in the spec mirror the Lesson 03 ownership rule — spec notes for routine decisions, ADRs for forks.</li>
+  <li>Open questions have an owner and a deadline. Questions without owners don't get answered.</li>
+</ul>
+
+<div class="footer-note">
+  <p>
+    Questions about anything in this lesson? Ask your teacher — type in the Claude Code prompt:
+    <em>"In Lesson 04, I'm unclear about [the thing]."</em>
+  </p>
+  <p style="margin-top:0.5rem;">
+    Up next: QA Strategy for Frontend — what to test, what not to test, and how to decide.
+    (Check the <a href="../learning-records/">learning records</a> for progress.)
+  </p>
+</div>
+
+<script>
+  function checkQuiz() {
+    const answers = { q1: 'b', q2: 'b', q3: 'b', q4: 'b' };
+    let correct = 0;
+
+    for (const [q, rightAnswer] of Object.entries(answers)) {
+      const selected = document.querySelector(`input[name="${q}"]:checked`);
+      const correctEl = document.getElementById(`${q}-correct`);
+      const wrongEl   = document.getElementById(`${q}-wrong`);
+
+      // Hide both first
+      correctEl.className = 'feedback';
+      wrongEl.className   = 'feedback';
+
+      if (!selected) continue;
+
+      if (selected.value === rightAnswer) {
+        correct++;
+        correctEl.className = 'feedback correct';
+      } else {
+        wrongEl.className = 'feedback wrong';
+      }
+    }
+
+    const scoreEl = document.getElementById('quiz-score');
+    scoreEl.style.display = 'block';
+    if (correct === 4) {
+      scoreEl.style.color = '#166534';
+      scoreEl.textContent = `4 / 4 — all correct. You have the model. Write a spec for your next feature.`;
+    } else {
+      scoreEl.style.color = '#92400e';
+      scoreEl.textContent = `${correct} / 4 — read the feedback above, then re-read the relevant spec sections before trying again.`;
+    }
+  }
+</script>
+
+</body>
+</html>
