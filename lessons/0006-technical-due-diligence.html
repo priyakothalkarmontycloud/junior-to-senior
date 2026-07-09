@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 06 — Technical Due Diligence</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a1a; --muted: #5a5a5a; --rule: #d8d0c4; --bg: #faf8f4;
+      --accent: #2563eb; --accent-light: #eff6ff; --warn: #92400e; --warn-light: #fef3c7;
+      --success: #166534; --success-light: #dcfce7; --fail: #991b1b; --fail-light: #fee2e2;
+      --code-bg: #f4f1ec;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+    body { font-family: var(--serif); font-size: 18px; line-height: 1.7; color: var(--ink); background: var(--bg); max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin-bottom: 0.3rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin: 2.8rem 0 0.7rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    p { margin-bottom: 1rem; } ul, ol { margin: 0 0 1rem 1.4rem; } li { margin-bottom: 0.3rem; }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 700; } em { font-style: italic; }
+    hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+    code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+    .lesson-meta { font-family: var(--sans); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .lesson-nav { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin-top: 0.4rem; margin-bottom: 3rem; }
+    .lesson-nav a { color: var(--muted); border-bottom-color: var(--rule); }
+    .lesson-nav a:hover { color: var(--accent); }
+    .callout { border-left: 3px solid var(--accent); background: var(--accent-light); padding: 0.9rem 1.1rem; margin: 1.6rem 0; border-radius: 0 4px 4px 0; font-family: var(--sans); font-size: 0.93rem; }
+    .callout-warn { border-left-color: #d97706; background: var(--warn-light); color: var(--warn); }
+    .three-cs { display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; margin: 1.4rem 0; font-family: var(--sans); font-size: 0.9rem; }
+    .three-cs .letter { font-size: 1.3rem; font-weight: 700; color: var(--accent); padding-top: 0.1rem; }
+    .three-cs .label { font-weight: 700; }
+    .three-cs .desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.9rem; }
+    .quiz { border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem 1.5rem; margin: 2rem 0; background: #fff; }
+    .quiz h2 { margin-top: 0; }
+    .quiz-q { margin-bottom: 1.6rem; }
+    .quiz-q p { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.7rem; }
+    .quiz-q label { display: block; font-family: var(--sans); font-size: 0.88rem; padding: 0.5rem 0.8rem; border: 1px solid var(--rule); border-radius: 5px; margin-bottom: 0.4rem; cursor: pointer; transition: background 0.1s; line-height: 1.4; }
+    .quiz-q label:hover { background: #f5f3ef; }
+    .quiz-q input[type=radio] { margin-right: 0.5rem; }
+    .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; padding: 0.7rem 0.9rem; border-radius: 5px; margin-top: 0.5rem; line-height: 1.5; }
+    .feedback.correct { background: var(--success-light); color: var(--success); display: block; }
+    .feedback.wrong { background: var(--fail-light); color: var(--fail); display: block; }
+    .quiz-btn { display: inline-block; margin-top: 1.2rem; padding: 0.55rem 1.2rem; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 0.88rem; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; }
+    .quiz-btn:hover { background: #1d4ed8; }
+    #quiz-score { display: none; margin-top: 1.2rem; font-family: var(--sans); font-size: 0.95rem; font-weight: 600; }
+    .footer-note { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 0.85rem; color: var(--muted); }
+    .footer-note a { color: var(--muted); }
+    @media print { body { background: #fff; padding: 1rem; } .quiz, .quiz-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="lesson-meta">Lesson 06 · Strategic Programming</div>
+<h1>Technical Due Diligence</h1>
+<div class="lesson-nav">
+  ← <a href="0001-technical-scoping.html">01: Scoping</a> ·
+  <a href="0002-architecture-decision-records.html">02: ADRs</a> ·
+  <a href="0003-component-design-before-you-build.html">03: Components</a> ·
+  <a href="0004-the-frontend-feature-spec.html">04: Spec</a> ·
+  <a href="0005-frontend-qa-strategy.html">05: QA Strategy</a>
+</div>
+
+<p>
+  A spec tells you what to build. A QA strategy tells you how to verify it.
+  Technical due diligence is what you do when you inherit something: reading code
+  or designs you didn't write, and forming a considered opinion about their quality.
+</p>
+
+<p>
+  It's the skill behind every code review, every onboarding conversation, every
+  architecture discussion where someone asks "have you looked at this?"
+  The gap between junior and senior developers in a review comes down to one thing:
+  what they're looking for.
+</p>
+
+<hr>
+
+<h2>The 3Cs framework</h2>
+
+<p>Three dimensions cover the important concerns in any codebase or design:</p>
+
+<div class="three-cs">
+  <div class="letter">C</div>
+  <div>
+    <div class="label">Correctness</div>
+    <div class="desc">Does it work for all cases — not just the happy path? Edge cases, error states, loading states, race conditions.</div>
+  </div>
+
+  <div class="letter">C</div>
+  <div>
+    <div class="label">Clarity</div>
+    <div class="desc">Can a developer unfamiliar with this code understand it without the author present? Naming, structure, comments where the why isn't obvious.</div>
+  </div>
+
+  <div class="letter">C</div>
+  <div>
+    <div class="label">Changeability</div>
+    <div class="desc">If requirements shift — and they will — how much breaks? Tight coupling, missing seams, multiple responsibilities in one place.</div>
+  </div>
+</div>
+
+<div class="callout">
+  Junior developers check Correctness. Senior developers check all three — and they know that Changeability failures are the most expensive, because they compound silently over months into rewrites.
+</div>
+
+<hr>
+
+<h2>Worked example: reviewing the AlertsPanel</h2>
+
+<p>Apply the 3Cs to the AlertsPanel from the <a href="0004-the-frontend-feature-spec.html">Lesson 04 spec</a>:</p>
+
+<h3>Correctness</h3>
+<ul>
+  <li>Does <code>AlertsList</code> handle loading and error states? A blank list while React Query fetches is a user-visible bug.</li>
+  <li>What happens if the delete API call fails? Does the alert disappear from the UI before the server confirms deletion?</li>
+  <li>Is the React Query cache correctly invalidated after a save? If not, the list shows stale data immediately after a create.</li>
+</ul>
+
+<h3>Clarity</h3>
+<ul>
+  <li><code>isModalOpen</code> is vague — <code>isAlertFormOpen</code> says what it controls.</li>
+  <li><code>ThresholdInput</code> doesn't say what kind of threshold. <code>SpendThresholdInput</code> is unambiguous.</li>
+</ul>
+
+<h3>Changeability</h3>
+<ul>
+  <li>If delete confirmation uses <code>window.confirm()</code> hardcoded in the component, it can't be unit-tested (tests can't trigger native browser dialogs) and can't be replaced with a custom modal without touching the component's logic.</li>
+  <li>A prop like <code>onDeleteConfirm</code> would create a seam — the component stays stable while the confirmation behavior changes.</li>
+</ul>
+
+<div class="callout callout-warn">
+  Correctness issues are bugs now. Clarity issues are time debt — they slow every future reader. Changeability issues are risk debt — they turn future features into rewrites.
+</div>
+
+<hr>
+
+<h2>What to comment on — and what to let go</h2>
+
+<p>Two rules for any review comment:</p>
+
+<ol>
+  <li><strong>Comment when you can name the 3C.</strong> "This is a Correctness issue — no error state means users see a blank screen on API failure." Specific, grounded, actionable.</li>
+  <li><strong>Don't comment when the answer is "I just prefer it differently."</strong> Personal style preferences create friction and noise. The 3Cs are your objectivity anchor.</li>
+</ol>
+
+<p>
+  A review that mixes objective findings with preferences trains the author to ignore
+  both. Keep the signal clean.
+</p>
+
+<hr>
+
+<h2>Practice</h2>
+
+<div class="quiz" id="quiz">
+  <h2>Quiz — four questions</h2>
+  <p style="font-family:var(--sans);font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">Choose the best answer. Feedback appears when you check.</p>
+
+  <div class="quiz-q" id="q1">
+    <p>1. A PR adds a fetch inside <code>useEffect</code> with no cleanup function. Which 3C does this violate first?</p>
+    <label><input type="radio" name="q1" value="a"> Clarity — the missing cleanup is hard to notice on first reading</label>
+    <label><input type="radio" name="q1" value="b"> Correctness — stale updates and memory leaks when component unmounts</label>
+    <label><input type="radio" name="q1" value="c"> Changeability — cleanup logic is always harder to add after the fact</label>
+    <label><input type="radio" name="q1" value="d"> None — React cleans up all effects automatically on unmount</label>
+    <div class="feedback" id="q1-correct">Correct. A missing cleanup is a bug — a component that unmounts before its fetch resolves will attempt to set state on an unmounted component. React does not cancel in-flight requests automatically. This is Correctness: it produces wrong behavior in a real scenario.</div>
+    <div class="feedback wrong" id="q1-wrong">Not quite. The correct answer is <strong>b — Correctness</strong>. A missing <code>useEffect</code> cleanup causes stale-data bugs when the component unmounts before the fetch resolves. React does not automatically cancel requests — you must return a cleanup function that cancels or ignores the response.</div>
+  </div>
+
+  <div class="quiz-q" id="q2">
+    <p>2. A variable is named <code>d</code> instead of <code>daysUntilReset</code>. Which 3C does this fail?</p>
+    <label><input type="radio" name="q2" value="a"> Correctness — ambiguous names cause incorrect usage in downstream code</label>
+    <label><input type="radio" name="q2" value="b"> Changeability — renaming variables is expensive across a large codebase</label>
+    <label><input type="radio" name="q2" value="c"> Clarity — the name communicates nothing to the next developer reading</label>
+    <label><input type="radio" name="q2" value="d"> None — short names are acceptable inside short, well-scoped functions</label>
+    <div class="feedback" id="q2-correct">Correct. <code>d</code> is a Clarity failure. It forces every future reader to decode the meaning from context. <code>daysUntilReset</code> carries the unit and the purpose — no decoding required.</div>
+    <div class="feedback wrong" id="q2-wrong">Not quite. The correct answer is <strong>c — Clarity</strong>. The name <code>d</code> communicates nothing without reading the surrounding code. Correctness is about what the code does; Changeability is about what breaks when requirements shift. This is purely a naming problem — it makes the code slower to read.</div>
+  </div>
+
+  <div class="quiz-q" id="q3">
+    <p>3. A <code>$500</code> threshold is hardcoded in three separate component files. Which 3C is most impacted?</p>
+    <label><input type="radio" name="q3" value="a"> Correctness — duplicate values drift out of sync over time in production</label>
+    <label><input type="radio" name="q3" value="b"> Clarity — magic numbers are confusing without inline comments explaining them</label>
+    <label><input type="radio" name="q3" value="c"> Changeability — updating it requires finding and editing three separate files</label>
+    <label><input type="radio" name="q3" value="d"> All equally — magic numbers always fail across all three dimensions</label>
+    <div class="feedback" id="q3-correct">Correct. Three hardcoded values is a Changeability failure. When the threshold changes, the developer must find all three, update them consistently, and hope they found them all. A named constant in one place makes it a single edit — and labels the intent.</div>
+    <div class="feedback wrong" id="q3-wrong">Not quite. The correct answer is <strong>c — Changeability</strong>. The most dangerous consequence is that future changes require finding and synchronising three places. Missing one is a silent bug. A named constant (<code>DEFAULT_ALERT_THRESHOLD</code>) solves all three, but Changeability is the primary and costliest failure.</div>
+  </div>
+
+  <div class="quiz-q" id="q4">
+    <p>4. In a code review, which of these should you NOT comment on?</p>
+    <label><input type="radio" name="q4" value="a"> A fetch call that shows no error state to the user on failure</label>
+    <label><input type="radio" name="q4" value="b"> A naming convention you personally dislike but isn't objectively confusing</label>
+    <label><input type="radio" name="q4" value="c"> A hardcoded string value that should come from environment configuration</label>
+    <label><input type="radio" name="q4" value="d"> A missing error boundary around a component that renders fetched data</label>
+    <div class="feedback" id="q4-correct">Correct. Personal style preferences — a convention you dislike but that isn't objectively unclear — are not worth commenting on. The 3Cs give you objectivity: if you can't name which 3C it violates, it's probably preference, not a real concern.</div>
+    <div class="feedback wrong" id="q4-wrong">Not quite. The correct answer is <strong>b</strong>. Style preferences you personally dislike don't belong in a review unless they're objectively confusing (Clarity). A fetch with no error state is Correctness; hardcoded env values are Changeability; a missing error boundary is Correctness. Those belong in the review.</div>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz()">Check answers</button>
+  <div id="quiz-score"></div>
+</div>
+
+<hr>
+
+<h2>Before your next review</h2>
+
+<p>For every comment you're about to leave, ask: which 3C does this address?</p>
+<ul>
+  <li>Name it in the comment: <em>"Correctness: this can cause stale data when the component unmounts..."</em></li>
+  <li>Suggest a fix alongside the observation.</li>
+  <li>If you can't name a 3C — consider whether the comment needs to exist.</li>
+</ul>
+
+<div class="callout">
+  <strong>Primary source:</strong>
+  <a href="https://google.github.io/eng-practices/review/reviewer/" target="_blank">How to do a Code Review — Google Engineering Practices</a>.
+  The clearest published standard for what to look for and how to write feedback that's kind, specific, and actionable.
+</div>
+
+<hr>
+
+<h2>Lesson summary</h2>
+<ul>
+  <li>The 3Cs: Correctness (bugs now), Clarity (time debt), Changeability (risk debt).</li>
+  <li>Junior developers check Correctness. Seniors check all three.</li>
+  <li>Changeability failures compound — they become rewrites.</li>
+  <li>If you can't name the 3C, reconsider the comment.</li>
+</ul>
+
+<div class="footer-note">
+  <p>Questions about this lesson? Ask: <em>"In Lesson 06, I'm unclear about [the thing]."</em></p>
+  <p style="margin-top:0.5rem;">Up next: Build vs. Buy vs. AI — the decision framework for when to write custom code, buy a library, or delegate to AI.</p>
+</div>
+
+<script>
+  function checkQuiz() {
+    const answers = { q1: 'b', q2: 'c', q3: 'c', q4: 'b' };
+    let correct = 0;
+    for (const [q, right] of Object.entries(answers)) {
+      const sel = document.querySelector('input[name="' + q + '"]:checked');
+      const cEl = document.getElementById(q + '-correct');
+      const wEl = document.getElementById(q + '-wrong');
+      cEl.className = 'feedback'; wEl.className = 'feedback';
+      if (!sel) continue;
+      if (sel.value === right) { correct++; cEl.className = 'feedback correct'; }
+      else { wEl.className = 'feedback wrong'; }
+    }
+    const s = document.getElementById('quiz-score');
+    s.style.display = 'block';
+    if (correct === 4) { s.style.color = '#166534'; s.textContent = '4 / 4 — all correct. Apply the 3Cs to your next PR review.'; }
+    else { s.style.color = '#92400e'; s.textContent = correct + ' / 4 — read the feedback above, then re-read the relevant sections.'; }
+  }
+</script>
+</body>
+</html>
