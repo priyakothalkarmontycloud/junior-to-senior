@@ -24,3 +24,10 @@
 - 2026-06-17: First session. Mission established, first lesson written on Technical Scoping.
 - 2026-06-23: Second session. Lesson 02 written on Architecture Decision Records (ADRs). Lesson 03 written on component decomposition and state ownership — first fully frontend-grounded lesson.
 - 2026-06-24: Third session. Lesson 04 written on the Frontend Feature Spec — synthesises Lessons 01-03 into a single deliverable. MontyCloud Cost Alerts used as worked example.
+- 2026-07-09: Fourth session. Lesson 05 on Frontend QA Strategy (Testing Trophy, behavior vs implementation, spec-to-tests pipeline).
+- 2026-07-10: Fifth session. Lessons 06-10 written in batch. First arc complete (10 lessons total).
+
+## User preferences
+- Do NOT auto-open browser after lesson creation
+- Do NOT use the Workflow tool — prefer direct Write calls in parallel
+- Lessons requested in batch should be written with parallel Write calls

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 07 — Build vs. Buy vs. AI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a1a; --muted: #5a5a5a; --rule: #d8d0c4; --bg: #faf8f4;
+      --accent: #2563eb; --accent-light: #eff6ff; --warn: #92400e; --warn-light: #fef3c7;
+      --success: #166534; --success-light: #dcfce7; --fail: #991b1b; --fail-light: #fee2e2;
+      --code-bg: #f4f1ec;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+    body { font-family: var(--serif); font-size: 18px; line-height: 1.7; color: var(--ink); background: var(--bg); max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin-bottom: 0.3rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin: 2.8rem 0 0.7rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    p { margin-bottom: 1rem; } ul, ol { margin: 0 0 1rem 1.4rem; } li { margin-bottom: 0.3rem; }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 700; } em { font-style: italic; }
+    hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+    code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+    .lesson-meta { font-family: var(--sans); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .lesson-nav { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin-top: 0.4rem; margin-bottom: 3rem; }
+    .lesson-nav a { color: var(--muted); border-bottom-color: var(--rule); }
+    .lesson-nav a:hover { color: var(--accent); }
+    .callout { border-left: 3px solid var(--accent); background: var(--accent-light); padding: 0.9rem 1.1rem; margin: 1.6rem 0; border-radius: 0 4px 4px 0; font-family: var(--sans); font-size: 0.93rem; }
+    .callout-warn { border-left-color: #d97706; background: var(--warn-light); color: var(--warn); }
+    .decision-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 0.86rem; margin: 1.4rem 0; }
+    .decision-table th { text-align: left; padding: 0.5rem 0.8rem; background: var(--code-bg); border: 1px solid var(--rule); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .decision-table td { padding: 0.5rem 0.8rem; border: 1px solid var(--rule); vertical-align: top; line-height: 1.5; }
+    .decision-table tr:nth-child(even) td { background: #fdfcfa; }
+    .mode-build { font-weight: 700; color: #1d4ed8; }
+    .mode-buy { font-weight: 700; color: var(--success); }
+    .mode-ai { font-weight: 700; color: #7c3aed; }
+    .quiz { border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem 1.5rem; margin: 2rem 0; background: #fff; }
+    .quiz h2 { margin-top: 0; }
+    .quiz-q { margin-bottom: 1.6rem; }
+    .quiz-q p { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.7rem; }
+    .quiz-q label { display: block; font-family: var(--sans); font-size: 0.88rem; padding: 0.5rem 0.8rem; border: 1px solid var(--rule); border-radius: 5px; margin-bottom: 0.4rem; cursor: pointer; transition: background 0.1s; line-height: 1.4; }
+    .quiz-q label:hover { background: #f5f3ef; }
+    .quiz-q input[type=radio] { margin-right: 0.5rem; }
+    .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; padding: 0.7rem 0.9rem; border-radius: 5px; margin-top: 0.5rem; line-height: 1.5; }
+    .feedback.correct { background: var(--success-light); color: var(--success); display: block; }
+    .feedback.wrong { background: var(--fail-light); color: var(--fail); display: block; }
+    .quiz-btn { display: inline-block; margin-top: 1.2rem; padding: 0.55rem 1.2rem; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 0.88rem; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; }
+    .quiz-btn:hover { background: #1d4ed8; }
+    #quiz-score { display: none; margin-top: 1.2rem; font-family: var(--sans); font-size: 0.95rem; font-weight: 600; }
+    .footer-note { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 0.85rem; color: var(--muted); }
+    .footer-note a { color: var(--muted); }
+    @media print { body { background: #fff; padding: 1rem; } .quiz, .quiz-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="lesson-meta">Lesson 07 · Strategic Programming</div>
+<h1>Build vs. Buy vs. AI</h1>
+<div class="lesson-nav">
+  ← <a href="0001-technical-scoping.html">01</a> ·
+  <a href="0002-architecture-decision-records.html">02</a> ·
+  <a href="0003-component-design-before-you-build.html">03</a> ·
+  <a href="0004-the-frontend-feature-spec.html">04</a> ·
+  <a href="0005-frontend-qa-strategy.html">05</a> ·
+  <a href="0006-technical-due-diligence.html">06: Due Diligence</a>
+</div>
+
+<p>
+  Every new feature starts with a hidden decision: are we building this, buying it, or generating it?
+  Most developers never make this choice consciously — they default to building because that's
+  what they know.
+</p>
+
+<p>
+  The cost of building is always underestimated. It's not just the initial code — it's the
+  maintenance, the migrations, the edge cases, the documentation, the debugging at 2am.
+  Senior developers default to "buy" for commodity problems and build only what genuinely
+  differentiates the product.
+</p>
+
+<hr>
+
+<h2>Three questions, three modes</h2>
+
+<p>Ask these in order:</p>
+
+<ol>
+  <li><strong>Is this a competitive differentiator?</strong> — If yes: <span class="mode-build">Build</span>. MontyCloud's cost optimization algorithm is a differentiator. A date picker is not.</li>
+  <li><strong>Does a trusted library or service solve this well?</strong> — If yes: <span class="mode-buy">Buy</span>. Date pickers, charting, auth, email delivery, maps — all have well-maintained solutions.</li>
+  <li><strong>Is it repetitive, bounded, and easily verifiable?</strong> — If yes: <span class="mode-ai">AI</span>. Form schemas, TypeScript interfaces, boilerplate CRUD — these can be generated and verified against a spec.</li>
+</ol>
+
+<div style="overflow-x: auto;">
+<table class="decision-table">
+  <thead>
+    <tr><th>Mode</th><th>When</th><th>MontyCloud example</th><th>Main risk</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="mode-build">Build</span></td>
+      <td>Core differentiator, unique to the product</td>
+      <td>Cost anomaly detection, cloud policy engine</td>
+      <td>You own every bug forever</td>
+    </tr>
+    <tr>
+      <td><span class="mode-buy">Buy</span></td>
+      <td>Commodity problem, mature library exists</td>
+      <td>Date picker, charting, auth, email</td>
+      <td>Dependency upgrades, API churn</td>
+    </tr>
+    <tr>
+      <td><span class="mode-ai">AI</span></td>
+      <td>Repetitive, bounded, easily testable</td>
+      <td>Form schemas, API interfaces, sparklines</td>
+      <td>Output must be verified against spec</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Worked example: the MontyCloud billing dashboard</h2>
+
+<p>MontyCloud is building a billing analytics dashboard. They need cost trend visualizations.</p>
+
+<h3>Main charts</h3>
+<p>
+  <span class="mode-buy">Buy</span> — Use Recharts or Victory. Tree-shakeable, actively maintained,
+  large community. Commodity charting gives MontyCloud no competitive advantage.
+  Building a custom charting engine would take months.
+</p>
+
+<h3>Anomaly detection highlighting</h3>
+<p>
+  <span class="mode-build">Build</span> — The logic that identifies and highlights cost anomalies
+  in the trend data is MontyCloud's differentiator. That algorithm must be owned.
+</p>
+
+<h3>Summary card sparklines</h3>
+<p>
+  <span class="mode-ai">AI</span> — The summary cards need 7-day cost trend sparklines at 40×20px.
+  Too small to justify importing Recharts. Generate custom SVG sparklines via AI,
+  verify against the spec's acceptance criterion.
+</p>
+
+<div class="callout">
+  Using all three modes in one feature is not only acceptable — it's usually optimal. The decision happens per-problem, not per-feature. The main charts use a library (buy). The anomaly logic is owned (build). The sparklines are generated (AI).
+</div>
+
+<h2>Write the decision down</h2>
+
+<p>
+  A build-vs-buy choice is a micro-<a href="0002-architecture-decision-records.html">ADR</a>.
+  Write it down: "Using Recharts for main charts because charting is commodity — not a MontyCloud
+  differentiator. Custom sparklines generated via AI — too small to warrant a library import."
+</p>
+
+<div class="callout callout-warn">
+  "We always write our own X" is not a decision — it's an assumption. Write it down and it becomes testable: is X actually a differentiator? Does a good library exist? The most dangerous default is building out of habit.
+</div>
+
+<hr>
+
+<h2>Practice</h2>
+
+<div class="quiz" id="quiz">
+  <h2>Quiz — four questions</h2>
+  <p style="font-family:var(--sans);font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">Choose the best answer. Feedback appears when you check.</p>
+
+  <div class="quiz-q" id="q1">
+    <p>1. MontyCloud needs a date range picker for billing report filters. Which mode?</p>
+    <label><input type="radio" name="q1" value="a"> Build — date pickers are complex enough that custom control pays off</label>
+    <label><input type="radio" name="q1" value="b"> Buy — date pickers are a solved, commodity problem with trusted libraries</label>
+    <label><input type="radio" name="q1" value="c"> AI — generate a date picker from a well-constrained detailed prompt</label>
+    <label><input type="radio" name="q1" value="d"> Skip — replace the date picker with a simple text input instead</label>
+    <div class="feedback" id="q1-correct">Correct. A date range picker is textbook "buy." The complexity — localization, accessibility, timezone handling, keyboard navigation — is exactly why mature libraries exist. Building gives MontyCloud no advantage and commits the team to maintaining every edge case.</div>
+    <div class="feedback wrong" id="q1-wrong">Not quite. The correct answer is <strong>b — Buy</strong>. Date pickers are commodity UI. The complexity (accessibility, timezones, localization) is solved by libraries like react-datepicker. Build is correct only for problems that differentiate MontyCloud; AI is overkill when npm install solves it.</div>
+  </div>
+
+  <div class="quiz-q" id="q2">
+    <p>2. Which part of MontyCloud is a genuine competitive differentiator worth building?</p>
+    <label><input type="radio" name="q2" value="a"> The table that renders billing line items with sorting and pagination</label>
+    <label><input type="radio" name="q2" value="b"> The algorithm that maps multi-cloud usage data to cost forecasts</label>
+    <label><input type="radio" name="q2" value="c"> The dropdown for selecting cloud accounts in the billing filter bar</label>
+    <label><input type="radio" name="q2" value="d"> The form validation for the alert threshold input in AlertFormModal</label>
+    <div class="feedback" id="q2-correct">Correct. MontyCloud's value comes from how it interprets and acts on cloud cost data. The cost forecast algorithm, anomaly detection, policy engine — these must be owned. Tables, dropdowns, and form validation are commodity infrastructure that any library handles.</div>
+    <div class="feedback wrong" id="q2-wrong">Not quite. The correct answer is <strong>b</strong>. Tables, dropdowns, and form validation are commodity UI — no competitive advantage. The cost forecast algorithm is where MontyCloud earns its value. That's what differentiates the product and must be owned and refined in-house.</div>
+  </div>
+
+  <div class="quiz-q" id="q3">
+    <p>3. A dev proposes building a custom auth library instead of using a managed service. Best counter-argument?</p>
+    <label><input type="radio" name="q3" value="a"> Building takes longer than integration, which delays the core feature</label>
+    <label><input type="radio" name="q3" value="b"> Auth is security-critical; bugs in custom auth have catastrophic consequences</label>
+    <label><input type="radio" name="q3" value="c"> Managed services have better documentation and larger community support</label>
+    <label><input type="radio" name="q3" value="d"> Custom auth is harder to test using standard frontend testing patterns</label>
+    <div class="feedback" id="q3-correct">Correct. Auth is not just commodity — it's security-critical. The cost of getting it wrong (data breach, account takeover, compliance failure) vastly exceeds any saving from building custom. This is where "buy" is not just more efficient — it's the responsible choice.</div>
+    <div class="feedback wrong" id="q3-wrong">Not quite. The correct answer is <strong>b</strong>. While development time (a) and documentation (c) are real advantages, the decisive argument is risk. Auth bugs are not UX regressions — they are security vulnerabilities that can compromise user data and violate compliance requirements.</div>
+  </div>
+
+  <div class="quiz-q" id="q4">
+    <p>4. When is AI the strongest mode for generating code?</p>
+    <label><input type="radio" name="q4" value="a"> Core business logic that evolves frequently as product requirements change</label>
+    <label><input type="radio" name="q4" value="b"> Repetitive, bounded, easily testable patterns like form schemas and interfaces</label>
+    <label><input type="radio" name="q4" value="c"> Any component where design and layout changes are expected over time</label>
+    <label><input type="radio" name="q4" value="d"> Complex third-party API integrations where SDK documentation is dense</label>
+    <div class="feedback" id="q4-correct">Correct. AI excels at repetitive (same pattern, different data), bounded (clear inputs and outputs), easily testable (verify against spec in minutes) work. Core business logic requires deep understanding, not generation. Complex integrations have hidden constraints a prompt can't capture.</div>
+    <div class="feedback wrong" id="q4-wrong">Not quite. The correct answer is <strong>b</strong>. AI-generated code works best when you can verify it quickly against a spec. Core business logic changes with product direction and requires judgment, not generation. UI components and complex integrations often have constraints that prompts miss.</div>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz()">Check answers</button>
+  <div id="quiz-score"></div>
+</div>
+
+<hr>
+
+<h2>Before your next feature decision</h2>
+
+<ol>
+  <li>Ask: "Is this a differentiator, a commodity, or boilerplate?"</li>
+  <li>Write one sentence: "Using [X] because [reason]."</li>
+  <li>If you can't answer question 1 — add it to your <a href="0004-the-frontend-feature-spec.html">spec's open questions</a>.</li>
+</ol>
+
+<div class="callout">
+  <strong>Primary source:</strong>
+  <a href="https://www.joelonsoftware.com/2001/10/14/in-defense-of-not-invented-here-syndrome/" target="_blank">In Defense of Not-Invented-Here Syndrome — Joel Spolsky (2001)</a>.
+  A counterintuitive argument: sometimes building the thing that exists is correct.
+  Read it alongside the default "always buy" advice to calibrate your own judgment.
+</div>
+
+<hr>
+
+<h2>Lesson summary</h2>
+<ul>
+  <li><strong>Build</strong> for competitive differentiators. <strong>Buy</strong> for commodity problems with mature libraries. <strong>AI</strong> for repetitive, bounded, testable work.</li>
+  <li>The cost of building is always higher than it looks — maintenance, bugs, upgrades.</li>
+  <li>Using all three modes in one feature is usually optimal.</li>
+  <li>Write the decision down. An unwritten default is an untested assumption.</li>
+</ul>
+
+<div class="footer-note">
+  <p>Questions? Ask: <em>"In Lesson 07, I'm unclear about [the thing]."</em></p>
+  <p style="margin-top:0.5rem;">Up next: Directing AI Effectively — the three elements that turn a vague prompt into production-ready code.</p>
+</div>
+
+<script>
+  function checkQuiz() {
+    const answers = { q1: 'b', q2: 'b', q3: 'b', q4: 'b' };
+    let correct = 0;
+    for (const [q, right] of Object.entries(answers)) {
+      const sel = document.querySelector('input[name="' + q + '"]:checked');
+      const cEl = document.getElementById(q + '-correct');
+      const wEl = document.getElementById(q + '-wrong');
+      cEl.className = 'feedback'; wEl.className = 'feedback';
+      if (!sel) continue;
+      if (sel.value === right) { correct++; cEl.className = 'feedback correct'; }
+      else { wEl.className = 'feedback wrong'; }
+    }
+    const s = document.getElementById('quiz-score');
+    s.style.display = 'block';
+    if (correct === 4) { s.style.color = '#166534'; s.textContent = '4 / 4 — apply this decision to your next feature element.'; }
+    else { s.style.color = '#92400e'; s.textContent = correct + ' / 4 — read the feedback above, then re-read the relevant sections.'; }
+  }
+</script>
+</body>
+</html>
