@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 05 — The Frontend QA Strategy</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a1a;
+      --muted: #5a5a5a;
+      --rule: #d8d0c4;
+      --bg: #faf8f4;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --warn: #92400e;
+      --warn-light: #fef3c7;
+      --success: #166534;
+      --success-light: #dcfce7;
+      --fail: #991b1b;
+      --fail-light: #fee2e2;
+      --code-bg: #f4f1ec;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+
+    body {
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--ink);
+      background: var(--bg);
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    /* ── Typography ── */
+    h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin-bottom: 0.3rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin: 2.8rem 0 0.7rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    p  { margin-bottom: 1rem; }
+    ul, ol { margin: 0 0 1rem 1.4rem; }
+    li { margin-bottom: 0.3rem; }
+    a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 700; }
+    em { font-style: italic; }
+    hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+    code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: var(--code-bg);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+
+    /* ── Lesson header ── */
+    .lesson-meta {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .lesson-nav {
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      margin-bottom: 3rem;
+    }
+    .lesson-nav a { color: var(--muted); border-bottom-color: var(--rule); }
+    .lesson-nav a:hover { color: var(--accent); }
+
+    /* ── Callouts ── */
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-light);
+      padding: 0.9rem 1.1rem;
+      margin: 1.6rem 0;
+      border-radius: 0 4px 4px 0;
+      font-family: var(--sans);
+      font-size: 0.93rem;
+    }
+    .callout-warn {
+      border-left-color: #d97706;
+      background: var(--warn-light);
+      color: var(--warn);
+    }
+    .callout-success {
+      border-left-color: #16a34a;
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    /* ── Testing Trophy ── */
+    .trophy {
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .trophy-row {
+      display: flex;
+      align-items: stretch;
+      width: 100%;
+      gap: 0;
+    }
+    .trophy-bar-wrap {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .trophy-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 1rem;
+      border-radius: 4px;
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      gap: 1rem;
+      transition: opacity 0.15s;
+    }
+    .trophy-bar .tier-name { letter-spacing: 0.02em; }
+    .trophy-bar .tier-label {
+      font-size: 0.72rem;
+      font-weight: 400;
+      opacity: 0.75;
+      white-space: nowrap;
+    }
+
+    /* widths encode emphasis */
+    .trophy-e2e    { width: 36%;  background: var(--code-bg); color: var(--muted); border: 1px solid var(--rule); }
+    .trophy-integ  { width: 82%;  background: var(--accent);  color: #fff; border: 1px solid var(--accent); }
+    .trophy-unit   { width: 56%;  background: var(--code-bg); color: var(--muted); border: 1px solid var(--rule); }
+    .trophy-static { width: 100%; background: #e8e4dd; color: var(--muted); border: 1px solid var(--rule); }
+
+    .trophy-spacer { height: 4px; }
+
+    .trophy-legend {
+      margin-top: 1.1rem;
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+    .trophy-legend strong { color: var(--ink); }
+
+    /* ── Behavior / implementation table ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      margin: 1.4rem 0;
+    }
+    .compare-table th {
+      text-align: left;
+      padding: 0.45rem 0.8rem;
+      background: var(--code-bg);
+      border: 1px solid var(--rule);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .compare-table td {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--rule);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .compare-table tr:nth-child(even) td { background: #fdfcfa; }
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-family: var(--sans);
+      font-weight: 700;
+      padding: 0.15em 0.5em;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .tag-do   { background: var(--success-light); color: var(--success); }
+    .tag-skip { background: var(--fail-light);    color: var(--fail); }
+
+    /* ── Spec → test mapping ── */
+    .mapping {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 1.2rem 0;
+    }
+    .mapping-header {
+      background: var(--code-bg);
+      padding: 0.5rem 1rem;
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--rule);
+    }
+    .mapping-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.8rem;
+      align-items: start;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--rule);
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .mapping-row:last-child { border-bottom: none; }
+    .mapping-criterion { color: var(--ink); }
+    .mapping-verdict {
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      padding-top: 0.1rem;
+    }
+    .verdict-yes  { color: var(--success); }
+    .verdict-no   { color: var(--fail); }
+    .verdict-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 0.2rem;
+    }
+
+    /* ── Quiz ── */
+    .quiz {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 1.4rem 1.5rem;
+      margin: 2rem 0;
+      background: #fff;
+    }
+    .quiz h2 { margin-top: 0; }
+    .quiz-q { margin-bottom: 1.6rem; }
+    .quiz-q p {
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.7rem;
+    }
+    .quiz-q label {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--rule);
+      border-radius: 5px;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+      transition: background 0.1s;
+      line-height: 1.4;
+    }
+    .quiz-q label:hover { background: #f5f3ef; }
+    .quiz-q input[type=radio] { margin-right: 0.5rem; }
+    .feedback {
+      display: none;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: 5px;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+    .feedback.correct { background: var(--success-light); color: var(--success); display: block; }
+    .feedback.wrong   { background: var(--fail-light);    color: var(--fail);    display: block; }
+    .quiz-btn {
+      display: inline-block;
+      margin-top: 1.2rem;
+      padding: 0.55rem 1.2rem;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .quiz-btn:hover { background: #1d4ed8; }
+    #quiz-score {
+      display: none;
+      margin-top: 1.2rem;
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    /* ── Footer ── */
+    .footer-note {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--rule);
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer-note a { color: var(--muted); }
+
+    @media (max-width: 520px) {
+      .trophy-e2e    { width: 48%; }
+      .trophy-integ  { width: 92%; }
+      .trophy-unit   { width: 70%; }
+      .trophy-static { width: 100%; }
+      .trophy-bar .tier-label { display: none; }
+      .mapping-row { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; padding: 1rem; }
+      .quiz-btn, .quiz { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="lesson-meta">Lesson 05 · Strategic Programming</div>
+<h1>The Frontend QA Strategy</h1>
+<div class="lesson-nav">
+  ← <a href="0001-technical-scoping.html">01: Scoping</a> ·
+  <a href="0002-architecture-decision-records.html">02: ADRs</a> ·
+  <a href="0003-component-design-before-you-build.html">03: Components</a> ·
+  <a href="0004-the-frontend-feature-spec.html">04: Feature Spec</a>
+</div>
+
+<p>
+  A <a href="0004-the-frontend-feature-spec.html">spec</a> tells you what to build.
+  A QA strategy tells you how to know when you've built it correctly.
+</p>
+
+<p>
+  Without one, you test whatever is easiest to test. That's almost never what matters most.
+  With one, every test you write earns its place — and you can confidently skip the ones that don't.
+</p>
+
+<hr>
+
+<h2>The Testing Trophy</h2>
+
+<p>
+  Kent C. Dodds introduced the Testing Trophy as a correction to the older "testing pyramid."
+  The key insight: <strong>integration tests are the sweet spot</strong> — they give more confidence
+  than unit tests with far less overhead than end-to-end tests.
+</p>
+
+<div class="trophy" aria-label="Testing Trophy diagram">
+  <div class="trophy-row">
+    <div class="trophy-bar-wrap">
+      <div class="trophy-bar trophy-e2e">
+        <span class="tier-name">E2E</span>
+        <span class="tier-label">Few — full user flows</span>
+      </div>
+    </div>
+  </div>
+  <div class="trophy-spacer"></div>
+  <div class="trophy-row">
+    <div class="trophy-bar-wrap">
+      <div class="trophy-bar trophy-integ">
+        <span class="tier-name">Integration</span>
+        <span class="tier-label">Most — components working together</span>
+      </div>
+    </div>
+  </div>
+  <div class="trophy-spacer"></div>
+  <div class="trophy-row">
+    <div class="trophy-bar-wrap">
+      <div class="trophy-bar trophy-unit">
+        <span class="tier-name">Unit</span>
+        <span class="tier-label">Some — complex logic in isolation</span>
+      </div>
+    </div>
+  </div>
+  <div class="trophy-spacer"></div>
+  <div class="trophy-row">
+    <div class="trophy-bar-wrap">
+      <div class="trophy-bar trophy-static">
+        <span class="tier-name">Static</span>
+        <span class="tier-label">Always — TypeScript, ESLint</span>
+      </div>
+    </div>
+  </div>
+  <p class="trophy-legend">Bar width = investment. <strong>Integration tests</strong> are the widest because they give the most confidence per unit of effort.</p>
+</div>
+
+<p>The four tiers, in practice:</p>
+
+<ul>
+  <li><strong>Static analysis</strong> — TypeScript and ESLint. Already on; catches typos and type errors before the browser sees them. Free confidence.</li>
+  <li><strong>Unit tests</strong> — one function or hook in total isolation. Worth it for complex pure logic (a budget formatter, a threshold validator). Not worth it for a component that just renders props.</li>
+  <li><strong>Integration tests</strong> — render a component tree with real React Query, fire events, assert what the user sees. This is where most testing effort should go.</li>
+  <li><strong>E2E tests</strong> — a real browser, a real server, a real database. Powerful but slow and fragile. Reserve for the most critical user paths (login, billing).</li>
+</ul>
+
+<hr>
+
+<h2>The one-sentence test</h2>
+
+<p>
+  Before writing any test, ask: <em>"Does this test give me confidence that [feature] works for users?"</em>
+</p>
+
+<p>
+  If the answer is yes — write it. If the answer is no, or "not really," skip it.
+  A test that doesn't give you confidence is not neutral. It costs maintenance time,
+  breaks on refactors that don't change behavior, and trains the team to ignore red builds.
+</p>
+
+<div class="callout">
+  "Write tests. Not too many. Mostly integration." — Guillermo Rauch, paraphrased by Kent C. Dodds.<br>
+  The "not too many" is as important as the rest. Coverage percentage is a vanity metric; confidence is the goal.
+</div>
+
+<hr>
+
+<h2>Test behavior, not implementation</h2>
+
+<p>
+  The most common mistake in frontend testing: testing <em>how</em> the component is built
+  instead of <em>what it does for the user</em>. Implementation details change on every refactor.
+  User behavior shouldn't.
+</p>
+
+<div style="overflow-x: auto;">
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>Test</th>
+      <th>Tests behavior?</th>
+      <th>Survives refactor?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>expect(isModalOpen).toBe(true)</code></td>
+      <td><span class="tag tag-skip">No</span></td>
+      <td><span class="tag tag-skip">No</span> — reads internal state</td>
+    </tr>
+    <tr>
+      <td><code>expect(screen.getByRole('dialog')).toBeInTheDocument()</code></td>
+      <td><span class="tag tag-do">Yes</span></td>
+      <td><span class="tag tag-do">Yes</span> — tests visible UI</td>
+    </tr>
+    <tr>
+      <td><code>expect(wrapper.find('.alert-item').length).toBe(3)</code></td>
+      <td><span class="tag tag-skip">No</span></td>
+      <td><span class="tag tag-skip">No</span> — tests CSS class names</td>
+    </tr>
+    <tr>
+      <td><code>expect(screen.getAllByRole('listitem')).toHaveLength(3)</code></td>
+      <td><span class="tag tag-do">Yes</span></td>
+      <td><span class="tag tag-do">Yes</span> — tests semantic structure</td>
+    </tr>
+    <tr>
+      <td><code>expect(component.state.formDirty).toBe(true)</code></td>
+      <td><span class="tag tag-skip">No</span></td>
+      <td><span class="tag tag-skip">No</span> — reads internal state</td>
+    </tr>
+    <tr>
+      <td><code>expect(screen.getByRole('button', {name: /save/i})).toBeEnabled()</code></td>
+      <td><span class="tag tag-do">Yes</span></td>
+      <td><span class="tag tag-do">Yes</span> — tests user-visible control</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  The pattern: use <code>screen.getByRole</code>, <code>screen.getByText</code>, and
+  <code>screen.getByLabelText</code>. Query the DOM the way a user interacts with it —
+  by role, label, and visible text. Not by class names, component internals, or instance methods.
+</p>
+
+<hr>
+
+<h2>The spec → tests pipeline</h2>
+
+<p>
+  The <a href="0004-the-frontend-feature-spec.html">Cost Alerts spec</a> from Lesson 04 has
+  three in-scope acceptance criteria. Here's how they map to frontend tests — and crucially,
+  which one doesn't:
+</p>
+
+<div class="mapping">
+  <div class="mapping-header">Cost Alerts — spec criteria → test verdict</div>
+
+  <div class="mapping-row">
+    <div>
+      <div class="mapping-criterion">A user can set a monthly spend threshold per cloud account.</div>
+      <div class="verdict-note">Render <code>AlertFormModal</code>, fill threshold + account, click Save, assert the API was called with the right payload.</div>
+    </div>
+    <div>
+      <div class="mapping-verdict verdict-yes">Frontend test</div>
+    </div>
+  </div>
+
+  <div class="mapping-row">
+    <div>
+      <div class="mapping-criterion">An email is sent when spend exceeds the threshold.</div>
+      <div class="verdict-note">This is backend behavior. The frontend's job is to save the threshold — not to send or verify the email. Testing this here means mocking your entire email service.</div>
+    </div>
+    <div>
+      <div class="mapping-verdict verdict-no">Not a frontend test</div>
+    </div>
+  </div>
+
+  <div class="mapping-row">
+    <div>
+      <div class="mapping-criterion">Alerts can be enabled, edited, or disabled.</div>
+      <div class="verdict-note">Three tests: Edit opens the form pre-filled with existing values. Disable toggles the alert off (and reflects immediately in the list). Delete removes the row after confirmation.</div>
+    </div>
+    <div>
+      <div class="mapping-verdict verdict-yes">Frontend tests (×3)</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout callout-warn">
+  <strong>The discipline:</strong> if the acceptance criterion doesn't involve the user
+  interacting with the UI or seeing something on screen, it's probably not a frontend test.
+  Don't chase 100% coverage of the spec — chase coverage of the UI surface.
+</div>
+
+<p>
+  This gives you a test list before you write a single line of test code —
+  the same way the spec gave you a component tree before you wrote a single line of component code.
+</p>
+
+<hr>
+
+<h2>What to skip</h2>
+
+<p>Four categories that are almost never worth testing in frontend work:</p>
+
+<ul>
+  <li><strong>Third-party components.</strong> Don't test that your design system's <code>&lt;Button&gt;</code> renders a <code>&lt;button&gt;</code> element. That's the library's job.</li>
+  <li><strong>Trivial pass-throughs.</strong> A component that only renders its props with no logic isn't worth a unit test. Test the parent that uses it meaningfully instead.</li>
+  <li><strong>CSS class names.</strong> Class names are implementation details. When you refactor <code>alert-item</code> to <code>AlertListItem</code>, no behavior changed — but tests that look for class names break.</li>
+  <li><strong>Static text that never changes.</strong> The page title, footer copyright, and static help text don't need tests. Test content that varies with data or user action.</li>
+</ul>
+
+<hr>
+
+<h2>Practice</h2>
+
+<div class="quiz" id="quiz">
+  <h2>Quiz — four questions</h2>
+  <p style="font-family:var(--sans);font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">
+    Choose the best answer for each. Feedback appears when you check.
+  </p>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <p>1. Which of these four tests is checking an implementation detail rather than user-visible behavior?</p>
+    <label><input type="radio" name="q1" value="a"> Three alert items appear when the API returns three alerts</label>
+    <label><input type="radio" name="q1" value="b"> Clicking the Edit button opens the modal with pre-filled values</label>
+    <label><input type="radio" name="q1" value="c"> The component's internal <code>isModalOpen</code> is true after clicking the trigger</label>
+    <label><input type="radio" name="q1" value="d"> An error message appears when the threshold field is left empty</label>
+    <div class="feedback" id="q1-correct">Correct. <code>isModalOpen</code> is internal component state — it's the mechanism, not the behavior. If you refactor to put the modal outside the component, or switch from a boolean to a ref, the state variable disappears. The behavior (the modal is visible) doesn't change. Test what the user sees: <code>screen.getByRole('dialog')</code>.</div>
+    <div class="feedback wrong" id="q1-wrong">Not quite. The correct answer is <strong>c</strong>. Reading <code>isModalOpen</code> directly tests how the modal is implemented, not whether it's visible to the user. Implementation details change on refactors that don't change behavior — and then tests break for no reason. Query the DOM instead: <code>screen.getByRole('dialog')</code>.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2">
+    <p>2. From the Cost Alerts spec, which acceptance criterion maps directly to a frontend integration test?</p>
+    <label><input type="radio" name="q2" value="a"> An email notification is sent to the user when spend exceeds the threshold</label>
+    <label><input type="radio" name="q2" value="b"> The form saves the threshold and account, then shows the new alert in the list</label>
+    <label><input type="radio" name="q2" value="c"> The backend validates that the threshold is a positive number before saving</label>
+    <label><input type="radio" name="q2" value="d"> The database stores each alert with the correct user ID and account reference</label>
+    <div class="feedback" id="q2-correct">Correct. This is the only criterion that describes something the user does in the UI and sees in the UI. You can render the form, fill it in, click Save, mock the API response, and assert the new alert appears in the list — all within a frontend test. The other three are backend and infrastructure concerns.</div>
+    <div class="feedback wrong" id="q2-wrong">Not quite. The correct answer is <strong>b</strong>. The others describe backend and infrastructure behavior: email sending, input validation on the server, and database writes. A frontend test can only observe UI interactions and verify what appears on screen. Don't mock your entire email service to test a UI form.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3">
+    <p>3. When testing AlertsPanel, why do integration tests give better ROI than unit tests on each child component?</p>
+    <label><input type="radio" name="q3" value="a"> Integration tests run faster and need less initial setup than unit tests do</label>
+    <label><input type="radio" name="q3" value="b"> Integration tests verify that the components actually work together as the user experiences them</label>
+    <label><input type="radio" name="q3" value="c"> Integration tests are required by React Testing Library's recommended configuration</label>
+    <label><input type="radio" name="q3" value="d"> Integration tests produce higher coverage numbers for the same number of test files</label>
+    <div class="feedback" id="q3-correct">Correct. Unit tests on <code>AlertsList</code> and <code>AlertFormModal</code> in isolation tell you each part works alone. They can't tell you that clicking "Edit" in the list actually opens the form with the right pre-filled data — because that interaction crosses the boundary between components. Integration tests exercise those boundaries, which is where bugs actually live.</div>
+    <div class="feedback wrong" id="q3-wrong">Not quite. The correct answer is <strong>b</strong>. Integration tests are often slower and need more setup than units. The advantage is that they test real interactions between components — the boundaries where bugs actually live. A unit test on AlertsList can pass while the integration between AlertsList and AlertFormModal is completely broken.</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4">
+    <p>4. You're deciding what to test for AlertFormModal. Which of these is the least worth testing?</p>
+    <label><input type="radio" name="q4" value="a"> Submitting the form with valid data calls the save API with the correct payload</label>
+    <label><input type="radio" name="q4" value="b"> Leaving the threshold field empty shows a validation error message to the user</label>
+    <label><input type="radio" name="q4" value="c"> The modal closes and the list refreshes after a successful save operation</label>
+    <label><input type="radio" name="q4" value="d"> The exact CSS class applied to the error message paragraph below the field</label>
+    <div class="feedback" id="q4-correct">Correct. The CSS class name is an implementation detail — it changes every time you rename a class, migrate to a CSS-in-JS library, or restructure the stylesheet. The behavior (an error message appears) is what matters. Test its presence with <code>screen.getByText(/threshold is required/i)</code>, not its class. The other three test real behavior the user experiences.</div>
+    <div class="feedback wrong" id="q4-wrong">Not quite. The correct answer is <strong>d</strong>. A CSS class name is an implementation detail with no user-visible meaning. Every time you rename or reorganise styles, the test breaks — but nothing changed for the user. The other three options all test behavior: API calls, validation feedback, and post-save state. Those are worth the cost.</div>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz()">Check answers</button>
+  <div id="quiz-score"></div>
+</div>
+
+<hr>
+
+<h2>Your next feature</h2>
+
+<p>
+  Take the spec you wrote (or will write) for your next MontyCloud ticket.
+  Before opening a test file, do this in a document or on paper:
+</p>
+
+<ol>
+  <li>List each in-scope acceptance criterion from section 2 of your spec.</li>
+  <li>For each criterion: is this something the user <em>does</em> in the UI or <em>sees</em> on screen? If yes, it's a frontend test candidate. If no, skip it.</li>
+  <li>For each candidate: describe the test in plain English — "render X, do Y, assert Z." Don't write code yet. You're writing a test spec, not a test suite.</li>
+  <li>Now write the tests. Integration-first; unit only for complex isolated logic.</li>
+</ol>
+
+<p>
+  That plain-English list is the QA strategy. It takes ten minutes to write and prevents two kinds of waste:
+  tests that give false confidence (they pass, but the feature is broken),
+  and tests that give false failures (they break, but the feature is fine).
+</p>
+
+<div class="callout">
+  <strong>Primary source:</strong>
+  <a href="https://kentcdodds.com/blog/write-tests" target="_blank">Write tests. Not too many. Mostly integration. — Kent C. Dodds</a>.
+  Also read <a href="https://kentcdodds.com/blog/testing-implementation-details" target="_blank">Testing Implementation Details</a>
+  (same author) for the clearest explanation of why implementation-detail tests hurt more than they help.
+</div>
+
+<hr>
+
+<h2>Lesson summary</h2>
+
+<ul>
+  <li>The Testing Trophy: invest most in <strong>integration tests</strong>. Static analysis is free; E2E is expensive; unit tests have their place for complex logic.</li>
+  <li>The one-sentence test: "Does this test give me confidence the feature works for users?" If no, don't write it.</li>
+  <li>Test <strong>behavior, not implementation</strong>. Query by role, label, and text — not class names or internal state.</li>
+  <li>Map your spec's acceptance criteria to tests before writing code. Not every criterion produces a frontend test.</li>
+  <li>Skip: third-party internals, trivial pass-throughs, CSS class names, static text.</li>
+</ul>
+
+<div class="footer-note">
+  <p>
+    Unclear on anything here? Ask your teacher:
+    <em>"In Lesson 05, I'm not sure about [the thing]."</em>
+  </p>
+  <p style="margin-top:0.5rem;">
+    Up next: Technical Due Diligence — reading and critiquing a component design you didn't write.
+    The skill behind strong code review and fast onboarding.
+  </p>
+</div>
+
+<script>
+  function checkQuiz() {
+    const answers = { q1: 'c', q2: 'b', q3: 'b', q4: 'd' };
+    let correct = 0;
+
+    for (const [q, rightAnswer] of Object.entries(answers)) {
+      const selected = document.querySelector(`input[name="${q}"]:checked`);
+      const correctEl = document.getElementById(`${q}-correct`);
+      const wrongEl   = document.getElementById(`${q}-wrong`);
+
+      correctEl.className = 'feedback';
+      wrongEl.className   = 'feedback';
+
+      if (!selected) continue;
+
+      if (selected.value === rightAnswer) {
+        correct++;
+        correctEl.className = 'feedback correct';
+      } else {
+        wrongEl.className = 'feedback wrong';
+      }
+    }
+
+    const scoreEl = document.getElementById('quiz-score');
+    scoreEl.style.display = 'block';
+    if (correct === 4) {
+      scoreEl.style.color = '#166534';
+      scoreEl.textContent = '4 / 4 — all correct. You have the model. Apply it to your next feature.';
+    } else {
+      scoreEl.style.color = '#92400e';
+      scoreEl.textContent = `${correct} / 4 — read the feedback above, then re-read the relevant sections before trying again.`;
+    }
+  }
+</script>
+
+</body>
+</html>
