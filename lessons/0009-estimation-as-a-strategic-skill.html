@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 09 — Estimation as a Strategic Skill</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a1a; --muted: #5a5a5a; --rule: #d8d0c4; --bg: #faf8f4;
+      --accent: #2563eb; --accent-light: #eff6ff; --warn: #92400e; --warn-light: #fef3c7;
+      --success: #166534; --success-light: #dcfce7; --fail: #991b1b; --fail-light: #fee2e2;
+      --code-bg: #f4f1ec;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+    body { font-family: var(--serif); font-size: 18px; line-height: 1.7; color: var(--ink); background: var(--bg); max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin-bottom: 0.3rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin: 2.8rem 0 0.7rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    p { margin-bottom: 1rem; } ul, ol { margin: 0 0 1rem 1.4rem; } li { margin-bottom: 0.3rem; }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 700; } em { font-style: italic; }
+    hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+    code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+    pre { background: var(--code-bg); border: 1px solid var(--rule); border-radius: 6px; padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--mono); font-size: 0.82rem; line-height: 1.6; margin: 1rem 0; }
+    .lesson-meta { font-family: var(--sans); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .lesson-nav { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin-top: 0.4rem; margin-bottom: 3rem; }
+    .lesson-nav a { color: var(--muted); border-bottom-color: var(--rule); }
+    .lesson-nav a:hover { color: var(--accent); }
+    .callout { border-left: 3px solid var(--accent); background: var(--accent-light); padding: 0.9rem 1.1rem; margin: 1.6rem 0; border-radius: 0 4px 4px 0; font-family: var(--sans); font-size: 0.93rem; }
+    .callout-warn { border-left-color: #d97706; background: var(--warn-light); color: var(--warn); }
+    .estimate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.4rem 0; }
+    .estimate-card { border: 1px solid var(--rule); border-radius: 7px; padding: 1rem; font-family: var(--sans); font-size: 0.88rem; }
+    .estimate-card .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.5rem; }
+    .estimate-card.good { border-color: #86efac; background: #f0fdf4; }
+    .estimate-card.bad { border-color: #fca5a5; background: #fff5f5; }
+    .three-part { display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; margin: 1.4rem 0; font-family: var(--sans); font-size: 0.9rem; }
+    .three-part .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 0.55rem; flex-shrink: 0; }
+    .dot-best { background: var(--success); }
+    .dot-exp { background: var(--accent); }
+    .dot-worst { background: #dc2626; }
+    .three-part .label { font-weight: 700; }
+    .three-part .desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.85rem; }
+    .quiz { border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem 1.5rem; margin: 2rem 0; background: #fff; }
+    .quiz h2 { margin-top: 0; }
+    .quiz-q { margin-bottom: 1.6rem; }
+    .quiz-q p { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.7rem; }
+    .quiz-q label { display: block; font-family: var(--sans); font-size: 0.88rem; padding: 0.5rem 0.8rem; border: 1px solid var(--rule); border-radius: 5px; margin-bottom: 0.4rem; cursor: pointer; transition: background 0.1s; line-height: 1.4; }
+    .quiz-q label:hover { background: #f5f3ef; }
+    .quiz-q input[type=radio] { margin-right: 0.5rem; }
+    .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; padding: 0.7rem 0.9rem; border-radius: 5px; margin-top: 0.5rem; line-height: 1.5; }
+    .feedback.correct { background: var(--success-light); color: var(--success); display: block; }
+    .feedback.wrong { background: var(--fail-light); color: var(--fail); display: block; }
+    .quiz-btn { display: inline-block; margin-top: 1.2rem; padding: 0.55rem 1.2rem; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 0.88rem; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; }
+    .quiz-btn:hover { background: #1d4ed8; }
+    #quiz-score { display: none; margin-top: 1.2rem; font-family: var(--sans); font-size: 0.95rem; font-weight: 600; }
+    .footer-note { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 0.85rem; color: var(--muted); }
+    .footer-note a { color: var(--muted); }
+    @media (max-width: 500px) { .estimate-grid { grid-template-columns: 1fr; } }
+    @media print { body { background: #fff; padding: 1rem; } .quiz, .quiz-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="lesson-meta">Lesson 09 · Strategic Programming</div>
+<h1>Estimation as a Strategic Skill</h1>
+<div class="lesson-nav">
+  ← <a href="0001-technical-scoping.html">01</a> ·
+  <a href="0002-architecture-decision-records.html">02</a> ·
+  <a href="0003-component-design-before-you-build.html">03</a> ·
+  <a href="0004-the-frontend-feature-spec.html">04</a> ·
+  <a href="0005-frontend-qa-strategy.html">05</a> ·
+  <a href="0006-technical-due-diligence.html">06</a> ·
+  <a href="0007-build-vs-buy-vs-ai.html">07</a> ·
+  <a href="0008-directing-ai-effectively.html">08: AI Directing</a>
+</div>
+
+<p>
+  Estimation is one of the most misunderstood skills in software development.
+  Most developers treat it as a guess dressed up as a number.
+  Senior developers treat it as a communication artifact — a document that makes
+  assumptions visible and creates shared understanding between developer and stakeholder.
+</p>
+
+<p>
+  The number matters less than what surrounds it. A 4-day estimate with explicit
+  assumptions is worth more than a 4-day estimate with none — because when the
+  assumptions break, everyone knows exactly why the estimate was wrong.
+</p>
+
+<hr>
+
+<h2>The planning fallacy</h2>
+
+<p>
+  Kahneman and Tversky identified the planning fallacy: humans systematically
+  underestimate task durations by imagining the task succeeding without interruption.
+  We plan the best case and call it the expected case.
+</p>
+
+<p>The fix is <strong>reference class forecasting</strong> — not "how long do I imagine this will take?" but "what did similar tasks actually take?"</p>
+
+<div class="estimate-grid">
+  <div class="estimate-card bad">
+    <div class="label">Gut feel</div>
+    "I can build this in 2 days. I know the codebase and it seems straightforward."
+  </div>
+  <div class="estimate-card good">
+    <div class="label">Reference class</div>
+    "The last 3 settings panels took 2, 3, and 4 days. This one adds React Query, which those didn't have. I estimate 4 days expected."
+  </div>
+</div>
+
+<hr>
+
+<h2>The three-part estimate</h2>
+
+<p>A single number is almost always wrong. A range is honest and more useful:</p>
+
+<div class="three-part">
+  <div class="dot dot-best"></div>
+  <div>
+    <div class="label">Best case</div>
+    <div class="desc">Everything goes right — API exists and matches the spec, no design changes, no interruptions.</div>
+  </div>
+
+  <div class="dot dot-exp"></div>
+  <div>
+    <div class="label">Expected</div>
+    <div class="desc">Based on the reference class, adjusted for known differences. This is the number you commit to.</div>
+  </div>
+
+  <div class="dot dot-worst"></div>
+  <div>
+    <div class="label">Worst case</div>
+    <div class="desc">The assumption that's most likely to break, breaks. This is where risk lives.</div>
+  </div>
+</div>
+
+<div class="callout">
+  A 2–7 day range communicates something a single number can't: where the risk is. It opens the conversation about what would need to be true to hit 2 days — and that conversation is often more valuable than the estimate itself.
+</div>
+
+<hr>
+
+<h2>Write down your assumptions</h2>
+
+<p>The estimate is only meaningful alongside its assumptions — the conditions that, if they break, invalidate the estimate.</p>
+
+<p>For any estimate, write down:</p>
+<ul>
+  <li>What must <em>exist</em> before you start (API endpoints, design decisions, access)</li>
+  <li>What must stay <em>stable</em> during the build (no scope changes, no blocking migrations)</li>
+  <li>What you're <em>not accounting for</em> (other high-priority tickets, onboarding)</li>
+</ul>
+
+<hr>
+
+<h2>Worked example: estimating Cost Alerts</h2>
+
+<p>Applying the three-part method to the <a href="0004-the-frontend-feature-spec.html">Lesson 04 spec</a>:</p>
+
+<p><strong>Reference class:</strong> The last comparable feature (account preferences settings panel) took 3 days. Cost Alerts adds React Query integration and a new modal pattern — both new work.</p>
+
+<p><strong>Three-part estimate:</strong></p>
+<ul>
+  <li>Best case: 2 days — API endpoint exists, matches spec, no design revisions.</li>
+  <li>Expected: 4 days — some back-and-forth on API design, one round of PM feedback.</li>
+  <li>Worst case: 7 days — API endpoint doesn't exist yet (open question from spec), requires backend coordination.</li>
+</ul>
+
+<p><strong>Assumptions written down:</strong></p>
+<pre>1. /api/alerts endpoint exists before day 1
+   (flagged as open question in spec — blocked if not)
+2. Design is final — no layout changes to AlertFormModal mid-build
+3. No other P0 tickets assigned during this sprint
+4. Backend validates threshold values — I only need to surface server errors</pre>
+
+<div class="callout callout-warn">
+  Look at assumption 1. This is the same open question that the <a href="0004-the-frontend-feature-spec.html">spec's section 5</a> surfaces. A good spec's open questions become the worst-case triggers in the estimate. They're the same list, viewed from a different angle.
+</div>
+
+<hr>
+
+<h2>Practice</h2>
+
+<div class="quiz" id="quiz">
+  <h2>Quiz — four questions</h2>
+  <p style="font-family:var(--sans);font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">Choose the best answer. Feedback appears when you check.</p>
+
+  <div class="quiz-q" id="q1">
+    <p>1. A junior dev estimates 2 days based on gut feel. A senior dev estimates 4–6 days. What most likely explains the gap?</p>
+    <label><input type="radio" name="q1" value="a"> The senior is more pessimistic about their own coding speed generally</label>
+    <label><input type="radio" name="q1" value="b"> The senior accounts for reviews, testing, deploys, and likely interruptions</label>
+    <label><input type="radio" name="q1" value="c"> The senior has deeper familiarity with this particular feature area</label>
+    <label><input type="radio" name="q1" value="d"> The senior includes time for stakeholder meetings and project updates</label>
+    <div class="feedback" id="q1-correct">Correct. Gut-feel estimates imagine coding in ideal conditions — no interruptions, no review cycles, no deploy pipeline. Senior estimates include the full cycle: writing, PR review wait time (~1 day), feedback revisions, testing, QA, deploy, and monitoring. These multipliers are invisible to gut feel but visible in reference classes.</div>
+    <div class="feedback wrong" id="q1-wrong">Not quite. The correct answer is <strong>b</strong>. The gap is almost never about coding speed — it's about the full delivery cycle. Code review wait time, feedback revisions, testing, and deploys each add time that gut feel ignores. Senior developers have been surprised enough times to account for them.</div>
+  </div>
+
+  <div class="quiz-q" id="q2">
+    <p>2. You're estimating a new dashboard widget. You did something similar last quarter. How should you use that?</p>
+    <label><input type="radio" name="q2" value="a"> Average your memory of that task with your current gut feel estimate</label>
+    <label><input type="radio" name="q2" value="b"> Use it as a reference class and adjust for known differences this time</label>
+    <label><input type="radio" name="q2" value="c"> Ignore it — every feature is unique enough that past data misleads</label>
+    <label><input type="radio" name="q2" value="d"> Use it only if both tasks used the same libraries and technical approach</label>
+    <div class="feedback" id="q2-correct">Correct. Reference class forecasting: your memory of the last similar task is more reliable than gut feel because it contains actual elapsed time — including interruptions, review cycles, and surprises. Adjust for known differences (this one adds React Query) rather than starting from imagination.</div>
+    <div class="feedback wrong" id="q2-wrong">Not quite. The correct answer is <strong>b</strong>. Averaging with gut feel (a) dilutes the empirical signal with the optimism you're trying to correct. Ignoring past data (c) discards the most useful information you have. The reference class isn't perfect — but it's always better than imagination.</div>
+  </div>
+
+  <div class="quiz-q" id="q3">
+    <p>3. Your estimate for a feature is 4 days. What else must you write down?</p>
+    <label><input type="radio" name="q3" value="a"> The names of every component and file you expect to create</label>
+    <label><input type="radio" name="q3" value="b"> A risk register of every possible thing that might go wrong</label>
+    <label><input type="radio" name="q3" value="c"> The assumptions that, if they break, would make the estimate wrong</label>
+    <label><input type="radio" name="q3" value="d"> A daily plan of what you'll work on during each of the four days</label>
+    <div class="feedback" id="q3-correct">Correct. Assumptions are what give the estimate its meaning. "4 days" is a number. "4 days, assuming the API exists by day 1 and design is final" is a contract. When the estimate is wrong, the assumptions tell you exactly why — and they tell the team what would need to be true to hit the original number.</div>
+    <div class="feedback wrong" id="q3-wrong">Not quite. The correct answer is <strong>c — assumptions</strong>. Component lists will change. Risk registers are useful but separate. Daily plans are premature. Assumptions are the conditions that make the estimate falsifiable — and actionable when they break.</div>
+  </div>
+
+  <div class="quiz-q" id="q4">
+    <p>4. A PM asks why you estimated 4 days for something they expected to take 1. Best response?</p>
+    <label><input type="radio" name="q4" value="a"> Walk through the reference class and the assumptions that produced the estimate</label>
+    <label><input type="radio" name="q4" value="b"> Break the implementation into subtasks and show the hours for each</label>
+    <label><input type="radio" name="q4" value="c"> Find a similar past story and show how long that one actually took</label>
+    <label><input type="radio" name="q4" value="d"> Revise down to 2 days and flag it as a risk in the sprint notes</label>
+    <div class="feedback" id="q4-correct">Correct. The reference class and assumptions are the evidence. Walking through them shows the estimate is grounded in data, not pessimism — and surfaces the assumptions the PM can help resolve ("Can the API be ready by day 1?"). It turns the conversation from a number dispute into a negotiation about risk.</div>
+    <div class="feedback wrong" id="q4-wrong">Not quite. The correct answer is <strong>a</strong>. Subtask breakdowns (b) add up to the same gut-feel optimism. A past story (c) is part of the reference class but not a full explanation. Revising down (d) trades accuracy for harmony and puts the risk entirely on you.</div>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz()">Check answers</button>
+  <div id="quiz-score"></div>
+</div>
+
+<hr>
+
+<h2>Your next estimate</h2>
+
+<ol>
+  <li>Find a reference class: "The last 2–3 tasks of this type took X days."</li>
+  <li>Write three parts: best / expected / worst, with the condition that drives each.</li>
+  <li>Write 3–4 assumptions: what must be true for the expected estimate to hold.</li>
+  <li>Share the range, not just the expected. The range is the information.</li>
+</ol>
+
+<div class="callout">
+  <strong>Primary source:</strong>
+  <a href="https://www.construx.com/books/software-estimation-demystifying-the-black-art/" target="_blank">Software Estimation: Demystifying the Black Art — Steve McConnell</a>.
+  The most rigorous treatment of software estimation in print. Even the first two chapters will permanently change how you estimate.
+</div>
+
+<hr>
+
+<h2>Lesson summary</h2>
+<ul>
+  <li>The planning fallacy: we imagine the best case. Reference classes correct this.</li>
+  <li>Three-part estimate (best / expected / worst) communicates uncertainty honestly.</li>
+  <li>Assumptions are the conditions that make the estimate valid — write them down.</li>
+  <li>The spec's open questions become the estimate's worst-case triggers. Same list, different angle.</li>
+</ul>
+
+<div class="footer-note">
+  <p>Questions? Ask: <em>"In Lesson 09, I'm unclear about [the thing]."</em></p>
+  <p style="margin-top:0.5rem;">Up next: Designing for Changeability — writing code that can be replaced without breaking everything around it.</p>
+</div>
+
+<script>
+  function checkQuiz() {
+    const answers = { q1: 'b', q2: 'b', q3: 'c', q4: 'a' };
+    let correct = 0;
+    for (const [q, right] of Object.entries(answers)) {
+      const sel = document.querySelector('input[name="' + q + '"]:checked');
+      const cEl = document.getElementById(q + '-correct');
+      const wEl = document.getElementById(q + '-wrong');
+      cEl.className = 'feedback'; wEl.className = 'feedback';
+      if (!sel) continue;
+      if (sel.value === right) { correct++; cEl.className = 'feedback correct'; }
+      else { wEl.className = 'feedback wrong'; }
+    }
+    const s = document.getElementById('quiz-score');
+    s.style.display = 'block';
+    if (correct === 4) { s.style.color = '#166534'; s.textContent = '4 / 4 — use this structure for your next estimate.'; }
+    else { s.style.color = '#92400e'; s.textContent = correct + ' / 4 — read the feedback above, then re-read the relevant sections.'; }
+  }
+</script>
+</body>
+</html>

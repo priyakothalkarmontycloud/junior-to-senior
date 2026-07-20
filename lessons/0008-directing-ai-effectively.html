@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 08 — Directing AI Effectively</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a1a; --muted: #5a5a5a; --rule: #d8d0c4; --bg: #faf8f4;
+      --accent: #2563eb; --accent-light: #eff6ff; --warn: #92400e; --warn-light: #fef3c7;
+      --success: #166534; --success-light: #dcfce7; --fail: #991b1b; --fail-light: #fee2e2;
+      --code-bg: #f4f1ec;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+    body { font-family: var(--serif); font-size: 18px; line-height: 1.7; color: var(--ink); background: var(--bg); max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin-bottom: 0.3rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin: 2.8rem 0 0.7rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    p { margin-bottom: 1rem; } ul, ol { margin: 0 0 1rem 1.4rem; } li { margin-bottom: 0.3rem; }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 700; } em { font-style: italic; }
+    hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+    code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+    pre { background: var(--code-bg); border: 1px solid var(--rule); border-radius: 6px; padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--mono); font-size: 0.82rem; line-height: 1.6; margin: 1rem 0; }
+    pre code { background: none; padding: 0; }
+    .lesson-meta { font-family: var(--sans); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .lesson-nav { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin-top: 0.4rem; margin-bottom: 3rem; }
+    .lesson-nav a { color: var(--muted); border-bottom-color: var(--rule); }
+    .lesson-nav a:hover { color: var(--accent); }
+    .callout { border-left: 3px solid var(--accent); background: var(--accent-light); padding: 0.9rem 1.1rem; margin: 1.6rem 0; border-radius: 0 4px 4px 0; font-family: var(--sans); font-size: 0.93rem; }
+    .callout-warn { border-left-color: #d97706; background: var(--warn-light); color: var(--warn); }
+    .callout-success { border-left-color: #16a34a; background: var(--success-light); color: var(--success); }
+    .prompt-label { font-family: var(--sans); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.3rem; margin-top: 1.2rem; }
+    .three-cs { display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; margin: 1.4rem 0; font-family: var(--sans); font-size: 0.9rem; }
+    .three-cs .letter { font-size: 1.3rem; font-weight: 700; color: var(--accent); padding-top: 0.1rem; }
+    .three-cs .label { font-weight: 700; }
+    .three-cs .desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.9rem; }
+    .quiz { border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem 1.5rem; margin: 2rem 0; background: #fff; }
+    .quiz h2 { margin-top: 0; }
+    .quiz-q { margin-bottom: 1.6rem; }
+    .quiz-q p { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.7rem; }
+    .quiz-q label { display: block; font-family: var(--sans); font-size: 0.88rem; padding: 0.5rem 0.8rem; border: 1px solid var(--rule); border-radius: 5px; margin-bottom: 0.4rem; cursor: pointer; transition: background 0.1s; line-height: 1.4; }
+    .quiz-q label:hover { background: #f5f3ef; }
+    .quiz-q input[type=radio] { margin-right: 0.5rem; }
+    .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; padding: 0.7rem 0.9rem; border-radius: 5px; margin-top: 0.5rem; line-height: 1.5; }
+    .feedback.correct { background: var(--success-light); color: var(--success); display: block; }
+    .feedback.wrong { background: var(--fail-light); color: var(--fail); display: block; }
+    .quiz-btn { display: inline-block; margin-top: 1.2rem; padding: 0.55rem 1.2rem; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 0.88rem; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; }
+    .quiz-btn:hover { background: #1d4ed8; }
+    #quiz-score { display: none; margin-top: 1.2rem; font-family: var(--sans); font-size: 0.95rem; font-weight: 600; }
+    .footer-note { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 0.85rem; color: var(--muted); }
+    .footer-note a { color: var(--muted); }
+    @media print { body { background: #fff; padding: 1rem; } .quiz, .quiz-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="lesson-meta">Lesson 08 · Strategic Programming</div>
+<h1>Directing AI Effectively</h1>
+<div class="lesson-nav">
+  ← <a href="0001-technical-scoping.html">01</a> ·
+  <a href="0002-architecture-decision-records.html">02</a> ·
+  <a href="0003-component-design-before-you-build.html">03</a> ·
+  <a href="0004-the-frontend-feature-spec.html">04</a> ·
+  <a href="0005-frontend-qa-strategy.html">05</a> ·
+  <a href="0006-technical-due-diligence.html">06</a> ·
+  <a href="0007-build-vs-buy-vs-ai.html">07: Build/Buy/AI</a>
+</div>
+
+<p>
+  Deciding to use AI is only the first step. The quality of what AI produces is almost
+  entirely determined by the quality of your instructions. A vague prompt gets
+  plausible-looking code. A precise prompt gets verifiable code.
+</p>
+
+<p>
+  As AI handles more tactical implementation, the ability to give it precise, bounded,
+  testable instructions becomes the leverage point. This lesson is about building that skill.
+</p>
+
+<hr>
+
+<h2>Three elements of a precise prompt</h2>
+
+<div class="three-cs">
+  <div class="letter">C</div>
+  <div>
+    <div class="label">Context</div>
+    <div class="desc">What system is this part of? What conventions, libraries, and patterns are already in use? What does this sit next to?</div>
+  </div>
+
+  <div class="letter">C</div>
+  <div>
+    <div class="label">Constraint</div>
+    <div class="desc">What must the output NOT do? No new dependencies. Match the existing file structure. Use only these components. No global state.</div>
+  </div>
+
+  <div class="letter">C</div>
+  <div>
+    <div class="label">Criterion</div>
+    <div class="desc">How will you know the output is correct? The acceptance criteria from your spec. This is the definition of done — and what makes the output verifiable.</div>
+  </div>
+</div>
+
+<div class="callout callout-warn">
+  Most prompts only have Context. "Write a React form for setting budget alerts." That's context-only. Without Constraints, AI picks whatever libraries it prefers. Without Criteria, there's no definition of done — and no way to know if the output is correct.
+</div>
+
+<hr>
+
+<h2>Worked example: prompting for AlertFormModal</h2>
+
+<p>From the <a href="0004-the-frontend-feature-spec.html">Lesson 04 spec</a>. Here's what bad and good prompts look like for the same component:</p>
+
+<div class="prompt-label">Bad prompt — Context only</div>
+<pre>"Write a React form component for setting budget alerts with a threshold input and account selector."</pre>
+
+<div class="prompt-label">Good prompt — Context + Constraint + Criterion</div>
+
+<div class="prompt-label" style="margin-top:1rem;">Context</div>
+<pre>MontyCloud is a cloud cost management SaaS. We use React with TypeScript,
+React Hook Form for forms, React Query for server state, and Tailwind.
+The component library has Modal, Input, Select, and Button components.
+See AlertsPanel in src/features/billing/AlertsPanel.tsx for the parent.</pre>
+
+<div class="prompt-label">Constraint</div>
+<pre>Use only React Hook Form and the existing component library.
+No new dependencies. Component-local state only — no new global store.
+Follow the file structure at src/features/billing/. Export as AlertFormModal.</pre>
+
+<div class="prompt-label">Criterion</div>
+<pre>The component must:
+(1) Accept props: initialValues?: {threshold: number; accountId: string},
+    onSave: (threshold: number, accountId: string) => void, onClose: () => void
+(2) Validate: threshold required, positive number; accountId required
+(3) Show inline validation errors below each field
+(4) Call onSave on valid submit, then call onClose
+(5) Reset form state when onClose is called</pre>
+
+<div class="callout callout-success">
+  Notice what the Criterion is: it's the acceptance criteria from the <a href="0004-the-frontend-feature-spec.html">Lesson 04 spec</a>, rewritten for an AI audience. The spec's in-scope list becomes the Criteria. The open questions become the Constraints. The component tree becomes Context. <strong>The spec and the prompt are the same document for two different audiences.</strong>
+</div>
+
+<hr>
+
+<h2>Verifying the output</h2>
+
+<p>AI output is a first draft, not a finished component. Before committing:</p>
+
+<ol>
+  <li>Walk through each Criterion item — does the output satisfy it?</li>
+  <li>Look for what's missing: loading states, error states, edge cases the prompt didn't mention.</li>
+  <li>Apply the <a href="0006-technical-due-diligence.html">Lesson 06 3Cs</a> — Correctness, Clarity, Changeability.</li>
+</ol>
+
+<div class="callout">
+  The most common failure: the AI produces code that looks right and passes the happy path, but has no error state (what if <code>onSave</code> rejects?) and no loading state (what if it's async?). Add these to the Criterion next time — and to this component now.
+</div>
+
+<hr>
+
+<h2>Practice</h2>
+
+<div class="quiz" id="quiz">
+  <h2>Quiz — four questions</h2>
+  <p style="font-family:var(--sans);font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">Choose the best answer. Feedback appears when you check.</p>
+
+  <div class="quiz-q" id="q1">
+    <p>1. A colleague's AI-generated component has no loading state and no error state. What element of their prompt was missing?</p>
+    <label><input type="radio" name="q1" value="a"> Context — AI didn't know the component makes asynchronous API calls</label>
+    <label><input type="radio" name="q1" value="b"> Constraint — no constraint was placed on how async behavior works</label>
+    <label><input type="radio" name="q1" value="c"> Criterion — no acceptance criteria specified loading or error states</label>
+    <label><input type="radio" name="q1" value="d"> Nothing — loading and error states should always be added manually</label>
+    <div class="feedback" id="q1-correct">Correct. Loading and error states are behavioral requirements — they belong in the Criterion. If the Criterion doesn't say "show a loading spinner while saving" and "show an error message on failure," AI won't invent them. The spec's acceptance criteria exist precisely to capture these cases.</div>
+    <div class="feedback wrong" id="q1-wrong">Not quite. The correct answer is <strong>c — Criterion</strong>. Context might mention the component calls an API, but that alone doesn't tell AI to render loading and error states. Criterion is where you specify required behavior. If it's not in the Criterion, it won't be in the output.</div>
+  </div>
+
+  <div class="quiz-q" id="q2">
+    <p>2. Which element prevents AI from introducing a new npm dependency you didn't want?</p>
+    <label><input type="radio" name="q2" value="a"> Criterion — specify what the output must accomplish and deliver</label>
+    <label><input type="radio" name="q2" value="b"> Constraint — explicitly list what the output must not do or depend on</label>
+    <label><input type="radio" name="q2" value="c"> Context — give enough background so AI understands the conventions</label>
+    <label><input type="radio" name="q2" value="d"> None — AI always chooses the most standard library for any problem</label>
+    <div class="feedback" id="q2-correct">Correct. The Constraint section is where you say "no new dependencies." Context might imply conventions, but it doesn't prevent AI from adding whatever seems helpful. Explicit constraints override AI's defaults. You must close doors explicitly, not implicitly.</div>
+    <div class="feedback wrong" id="q2-wrong">Not quite. The correct answer is <strong>b — Constraint</strong>. Context tells AI what exists; Constraint tells AI what it cannot do. Without an explicit constraint like "no new dependencies," AI will add whatever library seems most fitting. State prohibitions directly.</div>
+  </div>
+
+  <div class="quiz-q" id="q3">
+    <p>3. You've received AI-generated code for AlertFormModal. Before committing, what should you do first?</p>
+    <label><input type="radio" name="q3" value="a"> Run the linter and TypeScript compiler to catch syntax errors</label>
+    <label><input type="radio" name="q3" value="b"> Ask a teammate to review it the same way they'd review a PR</label>
+    <label><input type="radio" name="q3" value="c"> Verify it against the Criterion from your prompt, item by item</label>
+    <label><input type="radio" name="q3" value="d"> Read it carefully for style consistency against the existing codebase</label>
+    <div class="feedback" id="q3-correct">Correct. The Criterion is the definition of done. Walk through each item and check whether the output satisfies it. This catches the most important failures — missing behavior — before you spend time on style or linting. Linting and teammate review are valuable follow-ups, not first steps.</div>
+    <div class="feedback wrong" id="q3-wrong">Not quite. The correct answer is <strong>c — verify against the Criterion</strong>. Linting and style checks happen after. The Criterion is what you wrote as the definition of done before prompting — checking it first catches behavioral failures (missing loading states, wrong prop types) that no linter will find.</div>
+  </div>
+
+  <div class="quiz-q" id="q4">
+    <p>4. Which task should you NOT delegate to AI to generate code?</p>
+    <label><input type="radio" name="q4" value="a"> A TypeScript interface that mirrors the fields in a REST API response</label>
+    <label><input type="radio" name="q4" value="b"> Repetitive form schemas for a set of similar CRUD entities in the model</label>
+    <label><input type="radio" name="q4" value="c"> An architectural decision about how cross-feature billing state will be shared</label>
+    <label><input type="radio" name="q4" value="d"> A utility function that formats currency with locale and currency code</label>
+    <div class="feedback" id="q4-correct">Correct. Architectural decisions require understanding trade-offs, system history, and future direction — they can't be verified against a spec because the spec doesn't exist yet. The other three are excellent AI tasks: repetitive, bounded, and testable. An architectural decision is irreversible; generated interfaces are not.</div>
+    <div class="feedback wrong" id="q4-wrong">Not quite. The correct answer is <strong>c — architectural decision</strong>. AI can generate code from a clear spec, but it can't make judgment calls about system design. That requires knowing what already exists, what's changing, and what the team can maintain. TypeScript interfaces, schemas, and utility functions are all bounded and verifiable.</div>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz()">Check answers</button>
+  <div id="quiz-score"></div>
+</div>
+
+<hr>
+
+<h2>Your next AI-directed task</h2>
+
+<p>Before prompting AI to write any code:</p>
+<ol>
+  <li><strong>Context</strong> (2–3 sentences): "This is for MontyCloud. We use [libraries]. The parent component is [name] at [path]."</li>
+  <li><strong>Constraint</strong> (bullet list): "No new dependencies. Local state only. Follow [pattern]."</li>
+  <li><strong>Criterion</strong> (numbered list): "The output must: (1)... (2)... (3)..."</li>
+</ol>
+
+<p>The prompt is a spec for AI — the same discipline as the <a href="0004-the-frontend-feature-spec.html">feature spec</a> for the team.</p>
+
+<div class="callout">
+  <strong>Primary source:</strong>
+  <a href="https://simonwillison.net/2023/Dec/31/ai-assisted-dev/" target="_blank">What I've learned about AI-assisted development — Simon Willison</a>.
+  The most grounded, practical writing on using AI tools in real engineering work — from a senior practitioner who writes with precision about both the power and the limits.
+</div>
+
+<hr>
+
+<h2>Lesson summary</h2>
+<ul>
+  <li><strong>Context</strong> (what this is part of) + <strong>Constraint</strong> (what it must not do) + <strong>Criterion</strong> (definition of done).</li>
+  <li>Most prompts only have Context. Adding Constraints and Criteria is the leverage.</li>
+  <li>The Criterion is your spec's acceptance criteria, translated for an AI audience.</li>
+  <li>Verify output against the Criterion before committing. That's the definition of done.</li>
+</ul>
+
+<div class="footer-note">
+  <p>Questions? Ask: <em>"In Lesson 08, I'm unclear about [the thing]."</em></p>
+  <p style="margin-top:0.5rem;">Up next: Estimation as a Strategic Skill — how senior developers estimate, what they write down, and why their estimates are almost always more accurate.</p>
+</div>
+
+<script>
+  function checkQuiz() {
+    const answers = { q1: 'c', q2: 'b', q3: 'c', q4: 'c' };
+    let correct = 0;
+    for (const [q, right] of Object.entries(answers)) {
+      const sel = document.querySelector('input[name="' + q + '"]:checked');
+      const cEl = document.getElementById(q + '-correct');
+      const wEl = document.getElementById(q + '-wrong');
+      cEl.className = 'feedback'; wEl.className = 'feedback';
+      if (!sel) continue;
+      if (sel.value === right) { correct++; cEl.className = 'feedback correct'; }
+      else { wEl.className = 'feedback wrong'; }
+    }
+    const s = document.getElementById('quiz-score');
+    s.style.display = 'block';
+    if (correct === 4) { s.style.color = '#166534'; s.textContent = '4 / 4 — use this structure for your next AI prompt.'; }
+    else { s.style.color = '#92400e'; s.textContent = correct + ' / 4 — read the feedback above, then re-read the relevant sections.'; }
+  }
+</script>
+</body>
+</html>

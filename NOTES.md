@@ -26,6 +26,11 @@
 - 2026-06-24: Third session. Lesson 04 written on the Frontend Feature Spec — synthesises Lessons 01-03 into a single deliverable. MontyCloud Cost Alerts used as worked example.
 - 2026-07-09: Fourth session. Lesson 05 on Frontend QA Strategy (Testing Trophy, behavior vs implementation, spec-to-tests pipeline).
 - 2026-07-10: Fifth session. Lessons 06-10 written in batch. First arc complete (10 lessons total).
+- 2026-07-20: Sixth session. Arc 2 (System Design) kicked off. User confirmed sequencing: frontend-grounded
+  architecture first (rendering/data-fetching, frontend architecture at scale, API contracts, reliability
+  patterns), then classic distributed-systems fundamentals (CAP, databases, caching, load balancing) once
+  vocabulary is solid. Lesson 11 written on Non-Functional Requirements (the vocabulary lesson the whole
+  arc depends on) — revisits the MontyCloud Cost Alerts example from Arc 1 through an NFR lens.
 
 ## User preferences
 - Do NOT auto-open browser after lesson creation

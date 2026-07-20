@@ -54,3 +54,6 @@
 - No strong resource yet on AI-era scoping specifically (how to scope work when AI generates
   the implementation). This is an emerging area; worth watching.
 - Need a good resource specifically on QA strategy (testing philosophy, not testing tools).
+- Need resources for Arc 2 (System Design) beyond Kleppmann: a good frontend-architecture-at-scale
+  reference (micro-frontends, module federation), and a practical CAP theorem / consistency models
+  resource for the classic distributed-systems half of the arc.
