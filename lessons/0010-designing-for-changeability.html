@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 10 — Designing for Changeability</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a1a; --muted: #5a5a5a; --rule: #d8d0c4; --bg: #faf8f4;
+      --accent: #2563eb; --accent-light: #eff6ff; --warn: #92400e; --warn-light: #fef3c7;
+      --success: #166534; --success-light: #dcfce7; --fail: #991b1b; --fail-light: #fee2e2;
+      --code-bg: #f4f1ec;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+    body { font-family: var(--serif); font-size: 18px; line-height: 1.7; color: var(--ink); background: var(--bg); max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin-bottom: 0.3rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin: 2.8rem 0 0.7rem; letter-spacing: -0.01em; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    p { margin-bottom: 1rem; } ul, ol { margin: 0 0 1rem 1.4rem; } li { margin-bottom: 0.3rem; }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid #bfdbfe; }
+    a:hover { border-bottom-color: var(--accent); }
+    strong { font-weight: 700; } em { font-style: italic; }
+    hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+    code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
+    pre { background: var(--code-bg); border: 1px solid var(--rule); border-radius: 6px; padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--mono); font-size: 0.82rem; line-height: 1.6; margin: 0.8rem 0; }
+    pre code { background: none; padding: 0; }
+    .lesson-meta { font-family: var(--sans); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .lesson-nav { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin-top: 0.4rem; margin-bottom: 3rem; }
+    .lesson-nav a { color: var(--muted); border-bottom-color: var(--rule); }
+    .lesson-nav a:hover { color: var(--accent); }
+    .callout { border-left: 3px solid var(--accent); background: var(--accent-light); padding: 0.9rem 1.1rem; margin: 1.6rem 0; border-radius: 0 4px 4px 0; font-family: var(--sans); font-size: 0.93rem; }
+    .callout-warn { border-left-color: #d97706; background: var(--warn-light); color: var(--warn); }
+    .callout-success { border-left-color: #16a34a; background: var(--success-light); color: var(--success); }
+    .code-label { font-family: var(--sans); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.3rem; margin-top: 1.2rem; }
+    .code-bad .code-label { color: #dc2626; }
+    .code-good .code-label { color: var(--success); }
+    .quiz { border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem 1.5rem; margin: 2rem 0; background: #fff; }
+    .quiz h2 { margin-top: 0; }
+    .quiz-q { margin-bottom: 1.6rem; }
+    .quiz-q p { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.7rem; }
+    .quiz-q label { display: block; font-family: var(--sans); font-size: 0.88rem; padding: 0.5rem 0.8rem; border: 1px solid var(--rule); border-radius: 5px; margin-bottom: 0.4rem; cursor: pointer; transition: background 0.1s; line-height: 1.4; }
+    .quiz-q label:hover { background: #f5f3ef; }
+    .quiz-q input[type=radio] { margin-right: 0.5rem; }
+    .feedback { display: none; font-family: var(--sans); font-size: 0.88rem; padding: 0.7rem 0.9rem; border-radius: 5px; margin-top: 0.5rem; line-height: 1.5; }
+    .feedback.correct { background: var(--success-light); color: var(--success); display: block; }
+    .feedback.wrong { background: var(--fail-light); color: var(--fail); display: block; }
+    .quiz-btn { display: inline-block; margin-top: 1.2rem; padding: 0.55rem 1.2rem; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 0.88rem; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; }
+    .quiz-btn:hover { background: #1d4ed8; }
+    #quiz-score { display: none; margin-top: 1.2rem; font-family: var(--sans); font-size: 0.95rem; font-weight: 600; }
+    .footer-note { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-family: var(--sans); font-size: 0.85rem; color: var(--muted); }
+    .footer-note a { color: var(--muted); }
+    @media print { body { background: #fff; padding: 1rem; } .quiz, .quiz-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="lesson-meta">Lesson 10 · Strategic Programming</div>
+<h1>Designing for Changeability</h1>
+<div class="lesson-nav">
+  ← <a href="0001-technical-scoping.html">01</a> ·
+  <a href="0002-architecture-decision-records.html">02</a> ·
+  <a href="0003-component-design-before-you-build.html">03</a> ·
+  <a href="0004-the-frontend-feature-spec.html">04</a> ·
+  <a href="0005-frontend-qa-strategy.html">05</a> ·
+  <a href="0006-technical-due-diligence.html">06</a> ·
+  <a href="0007-build-vs-buy-vs-ai.html">07</a> ·
+  <a href="0008-directing-ai-effectively.html">08</a> ·
+  <a href="0009-estimation-as-a-strategic-skill.html">09: Estimation</a>
+</div>
+
+<p>
+  Code is never finished — it's only in various stages of being changed.
+  Requirements shift, libraries are deprecated, products pivot.
+  The question isn't <em>whether</em> your code will change: it's whether those changes
+  will be safe, localized, and cheap.
+</p>
+
+<p>
+  This is the strategic layer under everything in these lessons.
+  The <a href="0004-the-frontend-feature-spec.html">spec</a> designs changeability into
+  requirements. The <a href="0002-architecture-decision-records.html">ADR</a> documents
+  changeability decisions. The
+  <a href="0006-technical-due-diligence.html">3Cs review</a> catches changeability failures
+  before they compound. This lesson makes the concept concrete.
+</p>
+
+<hr>
+
+<h2>Seams: where change is allowed to happen</h2>
+
+<p>
+  A <strong>seam</strong> (Michael Feathers, <em>Working Effectively with Legacy Code</em>)
+  is a place in the codebase where you can change behavior without editing the code on either side.
+</p>
+
+<p>In a React component system, seams look like:</p>
+<ul>
+  <li><strong>Props</strong> — change what a component receives without changing its consumers</li>
+  <li><strong>Callbacks</strong> — change what happens on an event without changing what triggers it</li>
+  <li><strong>Custom hooks</strong> — change how data is fetched without touching the component that uses it</li>
+  <li><strong>Wrapper components</strong> — change the underlying library without touching feature logic</li>
+</ul>
+
+<p>The test for a seam: <em>"Can I swap this implementation for a different one without touching the code on either side?"</em></p>
+
+<hr>
+
+<h2>Worked example: the MontyCloud charting seam</h2>
+
+<p>
+  MontyCloud's billing dashboard uses Recharts today.
+  In 6 months, the team wants to evaluate D3 for custom animations.
+</p>
+
+<div class="code-bad">
+  <div class="code-label">Tightly coupled — no seam</div>
+  <pre><code>// CostTrendPanel.tsx
+import { LineChart, Line, XAxis, YAxis } from 'recharts';
+
+function CostTrendPanel({ accountId }) {
+  const { data } = useQuery(['cost', accountId], fetchCostData);
+  // data already in Recharts format: [{ date: '2024-01', amt: 1200 }, ...]
+  return (
+    &lt;LineChart data={data} width={400} height={200}&gt;
+      &lt;Line dataKey="amt" /&gt;
+      &lt;XAxis dataKey="date" /&gt;
+    &lt;/LineChart&gt;
+  );
+}</code></pre>
+</div>
+
+<div class="code-good">
+  <div class="code-label">With a seam</div>
+  <pre><code>// CostTrendPanel.tsx — owns data, knows nothing about charts
+function CostTrendPanel({ accountId }) {
+  const { data } = useQuery(['cost', accountId], fetchCostData);
+  const normalized = data?.map(d => ({ x: d.date, y: d.amt }));
+  return &lt;CostTrendChart points={normalized} /&gt;;  // ← seam here
+}
+
+// CostTrendChart.tsx — owns Recharts, knows nothing about billing
+import { LineChart, Line, XAxis, YAxis } from 'recharts';
+function CostTrendChart({ points }) {
+  const chartData = points?.map(p => ({ date: p.x, amt: p.y }));
+  return (
+    &lt;LineChart data={chartData} width={400} height={200}&gt;
+      &lt;Line dataKey="amt" /&gt;
+    &lt;/LineChart&gt;
+  );
+}</code></pre>
+</div>
+
+<p>
+  Swapping Recharts for D3 now means rewriting only <code>CostTrendChart</code>.
+  <code>CostTrendPanel</code>, its tests, and every consumer are untouched.
+  That's the power of a seam.
+</p>
+
+<div class="callout callout-warn">
+  You don't need to know in advance that you'll switch to D3. The seam is worth creating because it isolates change risk. If you never switch, the seam cost you almost nothing. If you do switch, it saves you a week.
+</div>
+
+<hr>
+
+<h2>Single responsibility and change locality</h2>
+
+<p>
+  A module with single responsibility has one reason to change.
+  When that reason occurs, only that module changes — everything around it stays stable.
+</p>
+
+<p>For frontend components, "one reason to change" usually means:</p>
+<ul>
+  <li>The <strong>visual design</strong> changes → only the JSX and styles</li>
+  <li>The <strong>data shape</strong> changes → only the data transformation layer</li>
+  <li>The <strong>business rule</strong> changes → only the logic layer</li>
+</ul>
+
+<p>
+  When a component mixes all three, any change touches everything —
+  and there's no change that's ever truly safe.
+</p>
+
+<div class="callout">
+  Single responsibility is not about small files — it's about focused files. A 200-line component that does one thing well is better than three 50-line components that are tangled together.
+</div>
+
+<hr>
+
+<h2>The changeability test</h2>
+
+<p>Before finalizing any component design, ask:</p>
+
+<p><em>"Can I replace [the most likely thing to change] without touching [the things that should stay stable]?"</em></p>
+
+<p>Applied to the MontyCloud billing dashboard:</p>
+<ul>
+  <li>"Can I replace the charting library without touching the data-fetching logic?" — With the seam above: <strong>yes</strong>.</li>
+  <li>"Can I replace <code>AlertFormModal</code> without touching <code>AlertsPanel</code>?" — If <code>AlertFormModal</code> accepts only typed props and callbacks: <strong>yes</strong>.</li>
+  <li>"Can I change the API data format without touching the chart rendering?" — If there's a normalisation layer: <strong>yes</strong>.</li>
+</ul>
+
+<p>If the answer is "no, I'd have to touch everything" — that's a Changeability failure from the <a href="0006-technical-due-diligence.html">Lesson 06 3Cs</a>.</p>
+
+<hr>
+
+<h2>Practice</h2>
+
+<div class="quiz" id="quiz">
+  <h2>Quiz — four questions</h2>
+  <p style="font-family:var(--sans);font-size:0.88rem;color:var(--muted);margin-bottom:1.2rem;">Choose the best answer. Feedback appears when you check.</p>
+
+  <div class="quiz-q" id="q1">
+    <p>1. A component fetches data, renders the UI, AND contains the delete business logic. What's the core problem?</p>
+    <label><input type="radio" name="q1" value="a"> It's hard to read — too much logic in one place for any developer to follow</label>
+    <label><input type="radio" name="q1" value="b"> Any change to data, UI, or logic requires touching and retesting the same file</label>
+    <label><input type="radio" name="q1" value="c"> It re-renders unnecessarily when unrelated state updates happen above it</label>
+    <label><input type="radio" name="q1" value="d"> It violates React's rules of hooks by mixing data and presentation concerns</label>
+    <div class="feedback" id="q1-correct">Correct. Three responsibilities = three reasons to change, all in the same file. A UI tweak risks breaking data logic. A business rule change touches the render. A data format change forces you to retest the whole component. Single responsibility localises each change to its own module.</div>
+    <div class="feedback wrong" id="q1-wrong">Not quite. The correct answer is <strong>b</strong>. Readability (a) may also suffer, but the primary changeability failure is that no change is ever isolated. When UI, data, and logic share one file, every change risks breaking the other two concerns — and every test must cover all three.</div>
+  </div>
+
+  <div class="quiz-q" id="q2">
+    <p>2. MontyCloud switches from Recharts to D3 and has to edit 12 files. What does this tell you?</p>
+    <label><input type="radio" name="q2" value="a"> The migration was poorly planned and should have been staged across sprints</label>
+    <label><input type="radio" name="q2" value="b"> Recharts had a complex API that required significant D3 translation work</label>
+    <label><input type="radio" name="q2" value="c"> The tests were thorough and all caught the interface change correctly</label>
+    <label><input type="radio" name="q2" value="d"> The library had no seam — Recharts knowledge leaked into 12 places in the codebase</label>
+    <div class="feedback" id="q2-correct">Correct. A library migration that touches 12 files means the library wasn't isolated. Recharts-specific types, data formats, and API calls spread throughout the codebase — so every layer that knew about charts had to change. A single seam (one CostTrendChart wrapper) makes this a 1-file migration.</div>
+    <div class="feedback wrong" id="q2-wrong">Not quite. The correct answer is <strong>d</strong>. 12 files is an architecture problem, not a planning problem. When a library change propagates everywhere, it means the library knowledge wasn't isolated behind a seam. The fix isn't better migration planning; it's a wrapper component that contains all library-specific code.</div>
+  </div>
+
+  <div class="quiz-q" id="q3">
+    <p>3. Which design gives <code>CostTrendChart</code> the best seam for future library changes?</p>
+    <label><input type="radio" name="q3" value="a"> Receives <code>points: {"{x: string, y: number}[]"}</code> and handles all Recharts rendering internally</label>
+    <label><input type="radio" name="q3" value="b"> CostTrendPanel imports LineChart from recharts and passes raw API data directly</label>
+    <label><input type="radio" name="q3" value="c"> Accepts a render prop that gets raw API data and returns a Recharts component</label>
+    <label><input type="radio" name="q3" value="d"> CostTrendChart and CostTrendPanel are in the same file to keep related code together</label>
+    <div class="feedback" id="q3-correct">Correct. A neutral interface (<code>{"{x, y}"}</code>) is independent of any charting library. <code>CostTrendChart</code> owns all Recharts knowledge internally — its interface doesn't change when the library does. Swapping to D3 means rewriting the internals only. Consumers are untouched because they only see the neutral <code>points</code> prop.</div>
+    <div class="feedback wrong" id="q3-wrong">Not quite. The correct answer is <strong>a</strong>. Option b leaks Recharts into the panel. Option c is complex and still exposes library concerns to consumers. Option d co-locates code without creating a seam — it just makes the coupling invisible. A neutral data interface (<code>x, y</code>) is what creates the seam.</div>
+  </div>
+
+  <div class="quiz-q" id="q4">
+    <p>4. What's the strongest signal that a codebase is designed for changeability?</p>
+    <label><input type="radio" name="q4" value="a"> All components are under 150 lines with clear, descriptive names throughout</label>
+    <label><input type="radio" name="q4" value="b"> You can change a library or data format in one file without touching consumers</label>
+    <label><input type="radio" name="q4" value="c"> The codebase has high test coverage across all components and utilities</label>
+    <label><input type="radio" name="q4" value="d"> Components follow a consistent folder structure and naming convention</label>
+    <div class="feedback" id="q4-correct">Correct. Changeability is about isolation, not size, naming, coverage, or structure. The test is whether a change is localized. "I changed the charting library and only had to touch CostTrendChart.tsx" is the proof. Everything else supports changeability but doesn't measure it directly.</div>
+    <div class="feedback wrong" id="q4-wrong">Not quite. The correct answer is <strong>b</strong>. Small components, tests, and structure all help — but you can have well-named, well-tested, well-structured code that is completely coupled. The only direct measure is whether a change is contained: does touching one module require touching its neighbours?</div>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz()">Check answers</button>
+  <div id="quiz-score"></div>
+</div>
+
+<hr>
+
+<h2>Apply this to your next feature</h2>
+
+<p>When reviewing your component design (or the spec's component tree from <a href="0004-the-frontend-feature-spec.html">Lesson 04</a>):</p>
+
+<ol>
+  <li>Name the two or three things most likely to change: the charting library, the data format, the UI design.</li>
+  <li>For each: is there a seam? Can it change without touching everything around it?</li>
+  <li>If not, add a seam: a wrapper component, a normalisation function, or a typed interface that contains the volatile part.</li>
+</ol>
+
+<div class="callout">
+  <strong>Primary sources:</strong>
+  <a href="https://www.oreilly.com/library/view/working-effectively-with/0131177052/" target="_blank">Working Effectively with Legacy Code — Michael Feathers</a> (the origin of the seam concept — Chapter 4 is essential reading regardless of legacy context) and
+  <a href="https://www.oreilly.com/library/view/a-philosophy-of/9781492062523/" target="_blank">A Philosophy of Software Design — John Ousterhout</a> (Chapters 4–5 on modules and information hiding).
+</div>
+
+<hr>
+
+<h2>Lesson summary</h2>
+<ul>
+  <li>A seam is a place where behavior can change without editing the code on either side.</li>
+  <li>Single responsibility: one reason to change means changes are localized.</li>
+  <li>The changeability test: "Can I replace X without touching Y?"</li>
+  <li>Seams are cheap insurance — you don't need to know in advance what will change.</li>
+  <li>This is the foundation all the other lessons build toward: specs, ADRs, reviews, and estimates are all tools for managing change safely.</li>
+</ul>
+
+<div class="footer-note">
+  <p>Questions? Ask: <em>"In Lesson 10, I'm unclear about [the thing]."</em></p>
+  <p style="margin-top:0.5rem;">You've completed the first arc of the Strategic Programming curriculum (Lessons 01–10). Return to any lesson to review, or ask: <em>"What should I learn next given where I am?"</em></p>
+</div>
+
+<script>
+  function checkQuiz() {
+    const answers = { q1: 'b', q2: 'd', q3: 'a', q4: 'b' };
+    let correct = 0;
+    for (const [q, right] of Object.entries(answers)) {
+      const sel = document.querySelector('input[name="' + q + '"]:checked');
+      const cEl = document.getElementById(q + '-correct');
+      const wEl = document.getElementById(q + '-wrong');
+      cEl.className = 'feedback'; wEl.className = 'feedback';
+      if (!sel) continue;
+      if (sel.value === right) { correct++; cEl.className = 'feedback correct'; }
+      else { wEl.className = 'feedback wrong'; }
+    }
+    const s = document.getElementById('quiz-score');
+    s.style.display = 'block';
+    if (correct === 4) { s.style.color = '#166534'; s.textContent = '4 / 4 — apply the changeability test to your next component design.'; }
+    else { s.style.color = '#92400e'; s.textContent = correct + ' / 4 — read the feedback above, then re-read the relevant sections.'; }
+  }
+</script>
+</body>
+</html>
